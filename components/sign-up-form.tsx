@@ -1,112 +1,85 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useActionState } from 'react';
 
+import { signup } from '@/app/auth/actions';
+import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createClient } from '@/lib/supabase/client';
+import { ActionState } from '@/lib/auth/middleware';
 import { cn } from '@/lib/utils';
 
-export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [repeatPassword, setRepeatPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
-
-    if (password !== repeatPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
-        },
-      });
-      if (error) throw error;
-      router.push('/auth/sign-up-success');
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>) {
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(signup, { error: '' });
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignUp}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
-                </div>
-                <Input
-                  id="repeat-password"
-                  type="password"
-                  required
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating an account...' : 'Sign up'}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{' '}
-              <Link href="/auth/login" className="underline underline-offset-4">
-                Login
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <form action={formAction} className={cn('flex flex-col gap-6', className)} {...props}>
+      <h1 className="text-center text-2xl font-bold">Create your account</h1>
+      <div className="grid gap-6">
+        <div className="grid gap-3">
+          <Label htmlFor="fullName">Full Name</Label>
+          <Input
+            id="fullName"
+            name="fullName"
+            type="text"
+            defaultValue={state.fullName}
+            placeholder="John Doe"
+            disabled={pending}
+            required
+          />
+        </div>
+        <div className="grid gap-3">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            defaultValue={state.email}
+            placeholder="m@example.com"
+            disabled={pending}
+            required
+          />
+        </div>
+        <div className="grid gap-3">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            disabled={pending}
+            required
+          />
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input id="confirmPassword" name="confirmPassword" type="password" disabled={pending} required />
+        </div>
+        <div className="grid gap-3">
+          <Label htmlFor="employeeId">Employee ID</Label>
+          <Input
+            id="employeeId"
+            name="employeeId"
+            type="text"
+            defaultValue={state.employeeId}
+            placeholder="H12C34"
+            disabled={pending}
+            required
+          />
+        </div>
+
+        {state.error && <ErrorMessage>{state.error}</ErrorMessage>}
+
+        <Button type="submit" className="w-full hover:cursor-pointer" disabled={pending}>
+          {pending ? 'Loading...' : 'Sign Up'}
+        </Button>
+      </div>
+      <div className="text-center text-sm">
+        Already have an account?{' '}
+        <Link href="/" className="underline underline-offset-4">
+          Log In
+        </Link>
+      </div>
+    </form>
   );
 }

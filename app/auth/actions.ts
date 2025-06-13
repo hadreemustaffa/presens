@@ -1,0 +1,123 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+import { validatedAction } from '@/lib/auth/middleware';
+import { createClient } from '@/lib/supabase/server';
+
+const loginSchema = z.object({
+  email: z.string().email().min(3).max(255),
+  password: z.string().min(8).max(100),
+});
+
+export const login = validatedAction(loginSchema, async (data) => {
+  const supabase = await createClient();
+
+  const { email, password } = data;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return {
+      error: 'Invalid email or password. Please try again.',
+      email,
+      password,
+    };
+  }
+
+  revalidatePath('/', 'layout');
+  redirect('/protected');
+});
+
+const signupSchema = z
+  .object({
+    fullName: z.string().min(3).max(255),
+    email: z.string().email({ message: 'Invalid email address' }).min(3).max(255),
+    password: z.string().min(8).max(100),
+    confirmPassword: z.string().min(8).max(100),
+    employeeId: z.string().min(3).max(32),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+export const signup = validatedAction(signupSchema, async (data) => {
+  const supabase = await createClient();
+
+  const { fullName, email, password, employeeId } = data;
+
+  const { error } = await supabase.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        full_name: fullName,
+        role: 'employee',
+        employee_id: employeeId.toUpperCase(),
+      },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/protected`,
+    },
+  });
+
+  if (error) {
+    return {
+      error: error.message,
+      fullName,
+      email,
+      employeeId,
+    };
+  }
+
+  revalidatePath('/', 'layout');
+  redirect('/sign-up-success');
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email().min(3).max(255),
+});
+
+export const forgotPassword = validatedAction(forgotPasswordSchema, async (data) => {
+  const supabase = await createClient();
+
+  const { email } = data;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`,
+  });
+
+  if (error) {
+    return {
+      error: 'Failed to send reset password email. Please try again.',
+    };
+  }
+
+  revalidatePath('/', 'layout');
+  return { success: true };
+});
+
+const updatePasswordSchema = z.object({
+  password: z.string().min(8).max(100),
+});
+
+export const updatePassword = validatedAction(updatePasswordSchema, async (data) => {
+  const supabase = await createClient();
+
+  const { password } = data;
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return {
+      error: 'Failed to update password. Please try again.',
+    };
+  }
+
+  revalidatePath('/', 'layout');
+  redirect('/protected');
+});
