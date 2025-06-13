@@ -19,7 +19,7 @@ export default function Home() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        router.replace('/protected');
+        router.replace('/dashboard');
       }
     };
 

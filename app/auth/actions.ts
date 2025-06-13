@@ -31,7 +31,7 @@ export const login = validatedAction(loginSchema, async (data) => {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/protected');
+  redirect('/dashboard');
 });
 
 const signupSchema = z
@@ -61,7 +61,7 @@ export const signup = validatedAction(signupSchema, async (data) => {
         role: 'employee',
         employee_id: employeeId.toUpperCase(),
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/protected`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
     },
   });
 
@@ -119,5 +119,5 @@ export const updatePassword = validatedAction(updatePasswordSchema, async (data)
   }
 
   revalidatePath('/', 'layout');
-  redirect('/protected');
+  redirect('/dashboard');
 });

@@ -4,7 +4,7 @@ import { AuthButton } from '@/components/auth-button';
 import { DeployButton } from '@/components/deploy-button';
 import { ThemeSwitcher } from '@/components/theme-switcher';
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-screen flex-col items-center">
       <div className="flex w-full flex-1 flex-col items-center gap-20">

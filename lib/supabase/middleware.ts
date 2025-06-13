@@ -47,7 +47,7 @@ export async function updateSession(request: NextRequest) {
   // redirect to the protected page if user is logged in and visiting the login page
   if (user && pathname === '/') {
     const url = request.nextUrl.clone();
-    url.pathname = '/protected';
+    url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 
