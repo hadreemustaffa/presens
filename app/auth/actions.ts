@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { validatedAction } from '@/lib/auth/middleware';
 import { createClient } from '@/lib/supabase/server';
+import { Departments } from '@/types/enums';
 
 const loginSchema = z.object({
   email: z.string().email().min(3).max(255),
@@ -41,6 +42,7 @@ const signupSchema = z
     password: z.string().min(8).max(100),
     confirmPassword: z.string().min(8).max(100),
     employeeId: z.string().min(3).max(32),
+    department: z.nativeEnum(Departments),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -50,7 +52,7 @@ const signupSchema = z
 export const signup = validatedAction(signupSchema, async (data) => {
   const supabase = await createClient();
 
-  const { fullName, email, password, employeeId } = data;
+  const { fullName, email, password, employeeId, department } = data;
 
   const { error } = await supabase.auth.signUp({
     email: email,
@@ -58,8 +60,8 @@ export const signup = validatedAction(signupSchema, async (data) => {
     options: {
       data: {
         full_name: fullName,
-        role: 'employee',
-        employee_id: employeeId.toUpperCase(),
+        employee_id: employeeId,
+        department: department,
       },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
     },
@@ -75,7 +77,7 @@ export const signup = validatedAction(signupSchema, async (data) => {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/sign-up-success');
+  redirect('/auth/sign-up-success');
 });
 
 const forgotPasswordSchema = z.object({

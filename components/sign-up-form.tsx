@@ -8,8 +8,10 @@ import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ActionState } from '@/lib/auth/middleware';
 import { cn } from '@/lib/utils';
+import { Departments } from '@/types/enums';
 
 export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(signup, { error: '' });
@@ -38,6 +40,7 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>
             type="email"
             defaultValue={state.email}
             placeholder="m@example.com"
+            autoComplete="off"
             disabled={pending}
             required
           />
@@ -55,17 +58,34 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>
           <Label htmlFor="confirmPassword">Confirm Password</Label>
           <Input id="confirmPassword" name="confirmPassword" type="password" disabled={pending} required />
         </div>
-        <div className="grid gap-3">
-          <Label htmlFor="employeeId">Employee ID</Label>
-          <Input
-            id="employeeId"
-            name="employeeId"
-            type="text"
-            defaultValue={state.employeeId}
-            placeholder="H12C34"
-            disabled={pending}
-            required
-          />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3">
+            <Label htmlFor="employeeId">Employee ID</Label>
+            <Input
+              id="employeeId"
+              name="employeeId"
+              type="text"
+              defaultValue={state.employeeId}
+              placeholder="H12C34"
+              disabled={pending}
+              required
+            />
+          </div>
+          <div className="grid gap-3">
+            <Label htmlFor="department">Department</Label>
+            <Select name="department" disabled={pending}>
+              <SelectTrigger id="department" className="w-full">
+                <SelectValue placeholder="Select a department" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(Departments).map((department) => (
+                  <SelectItem key={department} value={department}>
+                    {department}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {state.error && <ErrorMessage>{state.error}</ErrorMessage>}
