@@ -2,30 +2,10 @@
 
 import { Clock } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 import { LoginForm } from '@/components/login-form';
-import { createClient } from '@/lib/supabase/client';
 
 export default function Home() {
-  const router = useRouter();
-  const supabase = createClient();
-
-  useEffect(() => {
-    // automatically redirect if logged in
-    const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        router.replace('/dashboard');
-      }
-    };
-
-    checkAuth();
-  }, [router, supabase]);
-
   return (
     <main className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-8">
