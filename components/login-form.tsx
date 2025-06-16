@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-import { login } from '@/app/auth/actions';
+import { login } from '@/actions/auth/actions';
 import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ActionState } from '@/lib/auth/middleware';
+import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'form'>) {

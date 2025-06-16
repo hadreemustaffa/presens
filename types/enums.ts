@@ -9,3 +9,8 @@ export enum Departments {
   Admin = 'Admin',
   Management = 'Management',
 }
+
+export enum WorkMode {
+  Office = 'office',
+  Home = 'home',
+}

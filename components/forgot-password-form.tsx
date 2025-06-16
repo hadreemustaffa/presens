@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-import { forgotPassword } from '@/app/auth/actions';
+import { forgotPassword } from '@/actions/auth/actions';
 import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ActionState } from '@/lib/auth/middleware';
+import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {

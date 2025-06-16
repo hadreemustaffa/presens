@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-import { signup } from '@/app/auth/actions';
+import { signup } from '@/actions/auth/actions';
 import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ActionState } from '@/lib/auth/middleware';
+import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 import { Departments } from '@/types/enums';
 
