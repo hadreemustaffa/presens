@@ -3,7 +3,7 @@
 import { Clock } from 'lucide-react';
 import Link from 'next/link';
 
-import { LoginForm } from '@/components/login-form';
+import { LoginForm } from '@/components/forms/login-form';
 
 export default function Home() {
   return (

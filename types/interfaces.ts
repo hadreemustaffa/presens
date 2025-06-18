@@ -20,3 +20,8 @@ export interface UserMetadata {
   department: Departments[keyof Departments];
   employee_id: string;
 }
+
+export interface CountdownTimerProps {
+  startTime: string;
+  onComplete?: () => void;
+}

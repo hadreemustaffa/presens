@@ -1,9 +1,10 @@
 import dayjs from 'dayjs';
 
 import { getActiveUser, getAttendanceRecord } from '@/api/dashboard';
-import AddAttendanceRecordForm from '@/components/add-attendance-record-form';
-import { SectionCards } from '@/components/section-cards';
-import { Button } from '@/components/ui/button';
+import { ActivityCards } from '@/components/activity-cards';
+import AddAttendanceRecordForm from '@/components/forms/add-attendance-record-form';
+import QuickActions from '@/components/quick-actions';
+import StatusCard from '@/components/status-card';
 import { UserMetadata } from '@/types/interfaces';
 
 export default async function DashboardPage() {
@@ -15,21 +16,21 @@ export default async function DashboardPage() {
     work_date: dayjs().format('YYYY-MM-DD'),
   });
 
+  if (!record) {
+    return (
+      <div className="flex h-full w-full flex-col justify-between gap-12 p-4">
+        <AddAttendanceRecordForm />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-full w-full flex-col justify-between gap-12 p-4">
-      {record ? (
-        <>
-          <SectionCards {...record} />
-          <div className="w-full">
-            <form className="grid grid-cols-2 justify-between gap-4">
-              <Button size={'lg'}>Clock Out</Button>
-              <Button size={'lg'}>Lunch Out</Button>
-            </form>
-          </div>
-        </>
-      ) : (
-        <AddAttendanceRecordForm {...userMetadata} />
-      )}
+    <div className="grid h-full w-full grid-cols-1 gap-y-4 p-4 @[1024px]/main:grid-cols-3 @[1024px]/main:gap-x-4">
+      <div className="flex flex-col gap-4 @[1024px]/main:col-span-2">
+        <QuickActions {...record} />
+        <StatusCard {...record} />
+      </div>
+      <ActivityCards {...record} />
     </div>
   );
 }
