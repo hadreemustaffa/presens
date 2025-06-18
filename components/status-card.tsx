@@ -44,7 +44,7 @@ export default function StatusCard(record: AttendanceRecord) {
 
   const status = getAttendanceStatus();
   const statusInfo = STATUS_CONFIG[status];
-  const expectedEnd = convertTimeTodayToDayjs(record.clock_in!).add(9, 'hours').format('HH:mm');
+  const expectedEnd = convertTimeTodayToDayjs(record.clock_in).add(9, 'hours').format('HH:mm');
   const timeAbbr = getTimeOfDayAbbr(expectedEnd);
 
   return (
@@ -57,7 +57,7 @@ export default function StatusCard(record: AttendanceRecord) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 @[768px]/main:grid-cols-2">
-        {record.clock_in && <TimeRemainingStatus {...record} />}
+        <TimeRemainingStatus {...record} />
         <div>
           <p className="mb-1 text-sm">Expected End</p>
           {!record.clock_out ? (
@@ -75,16 +75,14 @@ export default function StatusCard(record: AttendanceRecord) {
 }
 
 const TimeRemainingStatus = (record: AttendanceRecord) => {
-  const [remaining, setRemaining] = useState(() =>
-    record.clock_in ? getRemainingWorkHours(record.clock_in) : { hours: 0, minutes: 0 },
-  );
+  const [remaining, setRemaining] = useState(getRemainingWorkHours(record.clock_in));
 
   useEffect(() => {
     if (!record.clock_in || record.clock_out) return;
 
     // Update every minute
     const interval = setInterval(() => {
-      setRemaining(getRemainingWorkHours(record.clock_in!));
+      setRemaining(getRemainingWorkHours(record.clock_in));
     }, 60 * 1000);
 
     return () => clearInterval(interval);

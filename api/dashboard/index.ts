@@ -28,18 +28,16 @@ export async function getAttendanceRecord({
 }: Pick<AttendanceRecord, 'employee_id' | 'work_date'>) {
   const supabase = await createClient();
 
-  if (employee_id && work_date) {
-    const { data, error } = await supabase
-      .from('attendance_records')
-      .select()
-      .eq('employee_id', employee_id)
-      .eq('work_date', work_date)
-      .maybeSingle();
+  const { data, error } = await supabase
+    .from('attendance_records')
+    .select()
+    .eq('employee_id', employee_id)
+    .eq('work_date', work_date)
+    .maybeSingle();
 
-    if (error) {
-      console.error(error);
-    }
-
-    return data;
+  if (error) {
+    console.error(error);
   }
+
+  return data;
 }

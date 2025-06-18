@@ -30,46 +30,46 @@ export type Database = {
     Tables: {
       attendance_records: {
         Row: {
-          clock_in: string | null;
+          clock_in: string;
           clock_out: string | null;
           created_at: string;
-          employee_id: string | null;
+          employee_id: string;
           id: number;
           is_on_leave: boolean;
           lunch_in: string | null;
           lunch_out: string | null;
           remarks: string | null;
           updated_at: string;
-          work_date: string | null;
-          work_mode: Database['public']['Enums']['work_mode'] | null;
+          work_date: string;
+          work_mode: Database['public']['Enums']['work_mode'];
         };
         Insert: {
-          clock_in?: string | null;
+          clock_in: string;
           clock_out?: string | null;
           created_at?: string;
-          employee_id?: string | null;
+          employee_id: string;
           id?: number;
           is_on_leave?: boolean;
           lunch_in?: string | null;
           lunch_out?: string | null;
           remarks?: string | null;
           updated_at?: string;
-          work_date?: string | null;
-          work_mode?: Database['public']['Enums']['work_mode'] | null;
+          work_date: string;
+          work_mode: Database['public']['Enums']['work_mode'];
         };
         Update: {
-          clock_in?: string | null;
+          clock_in?: string;
           clock_out?: string | null;
           created_at?: string;
-          employee_id?: string | null;
+          employee_id?: string;
           id?: number;
           is_on_leave?: boolean;
           lunch_in?: string | null;
           lunch_out?: string | null;
           remarks?: string | null;
           updated_at?: string;
-          work_date?: string | null;
-          work_mode?: Database['public']['Enums']['work_mode'] | null;
+          work_date?: string;
+          work_mode?: Database['public']['Enums']['work_mode'];
         };
         Relationships: [
           {

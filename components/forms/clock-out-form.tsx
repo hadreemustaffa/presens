@@ -80,7 +80,7 @@ export default function ClockOutForm(record: AttendanceRecord) {
         <Button type="submit" className="flex flex-col" disabled={pending}>
           Proceed to clock out
         </Button>
-        {record.clock_in && <CountdownTimer startTime={record.clock_in} />}
+        <CountdownTimer startTime={record.clock_in} />
       </DialogFooter>
     </form>
   );
