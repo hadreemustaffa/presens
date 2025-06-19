@@ -74,7 +74,7 @@ begin
  select count(*)
  from public.role_permissions
  where role_permissions.permission = authorize.requested_permission
-  and role_permissions.role = (auth.jwt() ->> 'user_role')::public.app_role
+  and role_permissions.role = (auth.jwt() ->> 'user_role')::public.app_roles
  into bind_permissions;
 
  return bind_permissions > 0;

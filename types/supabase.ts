@@ -198,7 +198,31 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      attendance_with_user: {
+        Row: {
+          clock_in: string | null;
+          clock_out: string | null;
+          department: string | null;
+          employee_id: string | null;
+          full_name: string | null;
+          id: number | null;
+          is_on_leave: boolean | null;
+          lunch_in: string | null;
+          lunch_out: string | null;
+          remarks: string | null;
+          work_date: string | null;
+          work_mode: Database['public']['Enums']['work_mode'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'attendance_records_employee_id_fkey';
+            columns: ['employee_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['employee_id'];
+          },
+        ];
+      };
     };
     Functions: {
       authorize: {
