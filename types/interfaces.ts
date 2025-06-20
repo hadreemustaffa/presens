@@ -13,6 +13,11 @@ export interface AttendanceRecord {
   remarks: Remarks | string | null;
 }
 
+export interface AttendanceRecordWithUserDetails extends AttendanceRecord {
+  full_name: string;
+  department: Departments[keyof Departments];
+}
+
 export interface UserMetadata {
   email: string;
   full_name: string;

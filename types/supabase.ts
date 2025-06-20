@@ -251,7 +251,8 @@ export type Database = {
         | 'attendance_records.select'
         | 'attendance_records.delete'
         | 'attendance_summaries.select'
-        | 'attendance_summaries.delete';
+        | 'attendance_summaries.delete'
+        | 'attendance_records.update';
       app_roles: 'admin';
       work_mode: 'office' | 'home';
     };
@@ -369,6 +370,7 @@ export const Constants = {
         'attendance_records.delete',
         'attendance_summaries.select',
         'attendance_summaries.delete',
+        'attendance_records.update',
       ],
       app_roles: ['admin'],
       work_mode: ['office', 'home'],

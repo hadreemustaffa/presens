@@ -1,7 +1,7 @@
 'use client';
 
 import { User } from '@supabase/supabase-js';
-import { IconBook, IconChartBar, IconDashboard, IconSearch, IconSettings } from '@tabler/icons-react';
+import { IconBook, IconChartBar, IconDashboard, IconSettings } from '@tabler/icons-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
 
@@ -19,34 +19,29 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-const data = {
-  navMain: [
+export const navLinks = {
+  main: [
     {
       title: 'Dashboard',
-      url: '#',
+      url: '/dashboard',
       icon: IconDashboard,
     },
     {
       title: 'Records',
-      url: '#',
+      url: '/dashboard/records',
       icon: IconBook,
     },
     {
       title: 'Summaries',
-      url: '#',
+      url: '/dashboard/summaries',
       icon: IconChartBar,
     },
   ],
-  navSecondary: [
+  secondary: [
     {
       title: 'Settings',
-      url: '#',
+      url: '/dashboard/settings',
       icon: IconSettings,
-    },
-    {
-      title: 'Search',
-      url: '#',
-      icon: IconSearch,
     },
   ],
 };
@@ -65,7 +60,7 @@ export function AppSidebar({ user, ...props }: AppSideBarProps) {
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center justify-between">
+          <SidebarMenuItem className="flex items-center justify-between gap-2">
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="#">
                 <Clock className="!size-5" />
@@ -77,8 +72,8 @@ export function AppSidebar({ user, ...props }: AppSideBarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={navLinks.main} />
+        <NavSecondary items={navLinks.secondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={navUser} />

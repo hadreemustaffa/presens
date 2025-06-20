@@ -25,7 +25,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="grid h-full w-full grid-cols-1 gap-y-4 p-4 @[1024px]/main:grid-cols-3 @[1024px]/main:gap-x-4">
+    <div className="grid h-full w-full grid-cols-1 grid-rows-[auto_1fr] gap-y-4 p-4 @[1024px]/main:grid-cols-3 @[1024px]/main:gap-x-4">
       <div className="flex flex-col gap-4 @[1024px]/main:col-span-2">
         <QuickActions {...record} />
         <StatusCard {...record} />

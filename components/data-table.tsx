@@ -1,57 +1,43 @@
 'use client';
 
 import {
-  closestCenter,
-  DndContext,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type UniqueIdentifier,
-} from '@dnd-kit/core';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import {
-  IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
-  IconCircleCheckFilled,
   IconDotsVertical,
-  IconGripVertical,
-  IconLayoutColumns,
-  IconLoader,
-  IconPlus,
-  IconTrendingUp,
 } from '@tabler/icons-react';
 import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   Row,
   SortingState,
+  Table as TableType,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { ArrowUpDown, ChevronDown, Trash } from 'lucide-react';
 import * as React from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { toast } from 'sonner';
-import { z } from 'zod';
 
-import { Badge } from '@/components/ui/badge';
+import { deleteMultipleRecords, deleteRecord, editRecord, editRemarks } from '@/actions/dashboard/actions';
 import { Button } from '@/components/ui/button';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Drawer,
   DrawerClose,
@@ -67,58 +53,43 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ActionState } from '@/lib/middleware';
+import { capitalizeFirstLetter } from '@/lib/utils';
+import { Remarks, WorkMode } from '@/types/enums';
+import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/types/interfaces';
 
-export const schema = z.object({
-  id: z.number(),
-  header: z.string(),
-  type: z.string(),
-  status: z.string(),
-  target: z.string(),
-  limit: z.string(),
-  reviewer: z.string(),
-});
-
-// Create a separate component for the drag handle
-function DragHandle({ id }: { id: number }) {
-  const { attributes, listeners } = useSortable({
-    id,
-  });
-
-  return (
-    <Button
-      {...attributes}
-      {...listeners}
-      variant="ghost"
-      size="icon"
-      className="text-muted-foreground size-7 hover:bg-transparent"
-    >
-      <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Drag to reorder</span>
-    </Button>
-  );
+export interface DataTableProps {
+  isAdmin: boolean;
+  data: AttendanceRecord[] | AttendanceRecordWithUserDetails[];
 }
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
-  {
-    id: 'drag',
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
+function setRemarkColor(remark: Remarks) {
+  switch (remark) {
+    case Remarks.EmergencyLeave:
+      return 'rounded-sm border p-1 bg-red-500/25';
+    case Remarks.AMLeave:
+      return 'rounded-sm border p-1 bg-blue-500/25';
+    case Remarks.PMLeave:
+      return 'rounded-sm border p-1 bg-green-500/25';
+    default:
+      return 'rounded-sm border p-1 bg-accent/25';
+  }
+}
+
+const getColumns = (isAdmin: boolean): ColumnDef<AttendanceRecord | AttendanceRecordWithUserDetails>[] => [
   {
     id: 'select',
     header: ({ table }) => (
       <div className="flex items-center justify-center">
         <Checkbox
+          name="selectAllRecords"
           checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
@@ -128,6 +99,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         <Checkbox
+          name={`record-${row.id}`}
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
@@ -138,123 +110,481 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'header',
-    header: 'Header',
-    cell: ({ row }) => {
-      return <TableCellViewer item={row.original} />;
+    accessorKey: 'work_date',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant={'ghost'}
+          className="hover:cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Date
+          <ArrowUpDown />
+        </Button>
+      );
     },
+    cell: ({ row }) => <div className="capitalize">{row.getValue('work_date')}</div>,
+  },
+  {
+    accessorKey: 'full_name',
+    header: 'Name',
+    cell: ({ row }) => <TableCellViewer {...row} />,
     enableHiding: false,
   },
   {
-    accessorKey: 'type',
-    header: 'Section Type',
+    accessorKey: 'employee_id',
+    header: 'Employee ID',
+    cell: ({ row }) => <div>{row.getValue('employee_id')}</div>,
+  },
+  {
+    accessorKey: 'department',
+    header: 'Department',
+    cell: ({ row }) => <div>{row.getValue('department')}</div>,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'work_mode',
+    header: 'Work Mode',
+    cell: ({ row }) => <div>{capitalizeFirstLetter(row.getValue('work_mode'))}</div>,
+  },
+  {
+    accessorKey: 'clock_in',
+    header: 'Clock In',
+    cell: ({ row }) => <div>{row.getValue('clock_in')}</div>,
+    enableColumnFilter: false,
+  },
+  {
+    accessorKey: 'clock_out',
+    header: 'Clock Out',
+    cell: ({ row }) => <div>{row.getValue('clock_out')}</div>,
+    enableColumnFilter: false,
+  },
+  {
+    accessorKey: 'lunch_out',
+    header: 'Lunch Out',
+    cell: ({ row }) => <div>{row.getValue('lunch_out')}</div>,
+    enableColumnFilter: false,
+  },
+  {
+    accessorKey: 'lunch_in',
+    header: 'Lunch In',
+    cell: ({ row }) => <div>{row.getValue('lunch_in')}</div>,
+    enableColumnFilter: false,
+  },
+  {
+    accessorKey: 'remarks',
+    header: 'Remarks',
+    filterFn: 'includesString',
     cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.type}
-        </Badge>
+      <div>
+        {row.getValue('remarks') ? (
+          <span className={`${setRemarkColor(row.getValue('remarks'))}`}>{row.getValue('remarks')}</span>
+        ) : (
+          '-'
+        )}
       </div>
     ),
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === 'Done' ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : (
-          <IconLoader />
-        )}
-        {row.original.status}
-      </Badge>
-    ),
+    accessorKey: 'actions',
+    header: 'Actions',
+    cell: ({ row }) => <>{isAdmin ? <RowMenuAdmin {...row} /> : <RowMenuUser {...row} />}</>,
+    enableColumnFilter: false,
   },
-  {
-    accessorKey: 'target',
-    header: () => <div className="w-full text-right">Target</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: 'Done',
-            error: 'Error',
-          });
-        }}
-      >
-        <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.target}
-          id={`${row.original.id}-target`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: 'limit',
-    header: () => <div className="w-full text-right">Limit</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: 'Done',
-            error: 'Error',
-          });
-        }}
-      >
-        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.limit}
-          id={`${row.original.id}-limit`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: 'reviewer',
-    header: 'Reviewer',
-    cell: ({ row }) => {
-      const isAssigned = row.original.reviewer !== 'Assign reviewer';
+];
 
-      if (isAssigned) {
-        return row.original.reviewer;
-      }
+export function DataTable({ data, isAdmin }: DataTableProps) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [filterBy, setFilterBy] = React.useState('remarks');
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+    // only show if admin
+    select: isAdmin,
+    full_name: isAdmin,
+    department: isAdmin,
+    employee_id: isAdmin,
+  });
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-      return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
-            </SelectContent>
-          </Select>
-        </>
-      );
+  const columns = React.useMemo(() => getColumns(isAdmin), [isAdmin]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    enableRowSelection: true,
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id.toString(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: {
+      sorting,
+      pagination,
+      columnFilters,
+      columnVisibility,
     },
-  },
-  {
-    id: 'actions',
-    cell: () => (
+  });
+
+  return (
+    <>
+      <div className="flex items-center gap-4 py-4">
+        <div className="flex w-full items-center">
+          <Input
+            id="remarks-filter"
+            type="text"
+            placeholder={`Filter ${filterBy.replace('_', ' ')}...`}
+            value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ''}
+            onChange={(event) => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
+            className="max-w-sm rounded-tr-none rounded-br-none"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="rounded-tl-none rounded-bl-none">
+                Filter by <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getVisibleLeafColumns()
+                .filter((column) => column.getCanFilter())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className={`pl-2 capitalize not-last:mb-1 ${column.id === filterBy ? 'bg-muted' : ''}`}
+                      checked={column.getIsFiltered()}
+                      onCheckedChange={(value) => value && setFilterBy(column.id)}
+                    >
+                      {column.id.replace('_', ' ')}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {column.id.replace('_', ' ')}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader className="bg-muted sticky top-0 z-10">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-row items-center gap-2">
+          {isAdmin && table.getFilteredSelectedRowModel().rows.length > 0 && <MultiSelectDeleteButton {...table} />}
+          <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
+            {isAdmin ? (
+              <p>
+                {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+                selected.
+              </p>
+            ) : (
+              <p>{table.getFilteredRowModel().rows.length} row(s) found.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-8">
+          <div className="hidden items-center gap-2 lg:flex">
+            <Label htmlFor="rows-per-page" className="text-sm font-medium">
+              Rows per page
+            </Label>
+            <Select
+              name="select-rows-per-page"
+              value={`${table.getState().pagination.pageSize}`}
+              onValueChange={(value) => {
+                table.setPageSize(Number(value));
+              }}
+            >
+              <SelectTrigger size="sm" className="w-20" id="rows-per-page">
+                <SelectValue placeholder={table.getState().pagination.pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex w-fit items-center justify-center gap-2 text-sm font-medium">
+            <p>Page</p>
+            <Input
+              id="table-page"
+              type="number"
+              min="1"
+              max={table.getPageCount()}
+              defaultValue={table.getState().pagination.pageIndex + 1}
+              onChange={(e) => {
+                const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                table.setPageIndex(page);
+              }}
+              className="h-fit w-16 rounded-md border text-right"
+            />
+            <p>of {table.getPageCount()}</p>
+          </div>
+          <div className="ml-auto flex items-center gap-2 lg:ml-0">
+            <Button
+              variant="outline"
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <span className="sr-only">Go to first page</span>
+              <IconChevronsLeft />
+            </Button>
+            <Button
+              variant="outline"
+              className="size-8"
+              size="icon"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <span className="sr-only">Go to previous page</span>
+              <IconChevronLeft />
+            </Button>
+            <Button
+              variant="outline"
+              className="size-8"
+              size="icon"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <span className="sr-only">Go to next page</span>
+              <IconChevronRight />
+            </Button>
+            <Button
+              variant="outline"
+              className="hidden size-8 lg:flex"
+              size="icon"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              <span className="sr-only">Go to last page</span>
+              <IconChevronsRight />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDetails>) {
+  const [openDrawer, setOpenDrawer] = React.useState(false);
+  const isMobile = useIsMobile();
+
+  const [state, action, pending] = React.useActionState<ActionState, FormData>(editRecord, {
+    error: '',
+    success: '',
+  });
+
+  React.useEffect(() => {
+    if (state?.error) {
+      toast.error('An error has occurred', {
+        description: state.error,
+        action: { label: 'Close', onClick: () => {} },
+      });
+    }
+  }, [state]);
+
+  React.useEffect(() => {
+    if (state?.success) {
+      toast.success('Success!', {
+        description: state.success,
+        action: { label: 'Close', onClick: () => {} },
+      });
+      setOpenDrawer(false);
+    }
+  }, [state?.success]);
+
+  return (
+    <Drawer direction={isMobile ? 'bottom' : 'right'} open={openDrawer} onOpenChange={setOpenDrawer}>
+      <DrawerTrigger asChild>
+        <Button variant="link" className="text-foreground w-fit px-0 text-left">
+          {row.getValue('full_name')}
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="gap-1">
+          <DrawerTitle>Edit employee record</DrawerTitle>
+          <DrawerDescription>Review the information, make edits, and save.</DrawerDescription>
+        </DrawerHeader>
+        <form id="edit-record-form" className="flex flex-col gap-4 p-4" action={action}>
+          <input type="hidden" name="work_date" value={row.original.work_date} />
+          <input type="hidden" name="employee_id" value={row.original.employee_id} />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="clock_in">Clock In</Label>
+              <Input
+                id="clock_in"
+                name="clock_in"
+                type="time"
+                className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                defaultValue={row.getValue('clock_in')}
+              />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="lunch_out">Lunch Out</Label>
+              <Input
+                id="lunch_out"
+                name="lunch_out"
+                type="time"
+                className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                defaultValue={row.getValue('lunch_out')}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="lunch_in">Lunch In</Label>
+              <Input
+                id="lunch_in"
+                name="lunch_in"
+                type="time"
+                className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                defaultValue={row.getValue('lunch_in')}
+              />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="clock_out">Clock Out</Label>
+              <Input
+                id="clock_out"
+                name="clock_out"
+                type="time"
+                className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                defaultValue={row.getValue('clock_out')}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-3">
+            <Label htmlFor="work_mode">Work Mode</Label>
+            <Select name="work_mode" defaultValue={row.getValue('work_mode')}>
+              <SelectTrigger id="work_mode" className="w-full">
+                <SelectValue placeholder="Select work mode" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(WorkMode).map((mode) => (
+                  <SelectItem key={mode} value={mode}>
+                    {capitalizeFirstLetter(mode)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </form>
+
+        <DrawerFooter>
+          <Button type="submit" form="edit-record-form" disabled={pending}>
+            {pending ? 'Saving...' : 'Save'}
+          </Button>
+          <DrawerClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
+function RowMenuUser(row: Row<AttendanceRecord | AttendanceRecordWithUserDetails>) {
+  const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [remarks, setRemarks] = React.useState<Remarks[keyof Remarks]>();
+
+  const [state, action, pending] = React.useActionState<ActionState, FormData>(editRemarks, {
+    error: '',
+    success: '',
+  });
+
+  React.useEffect(() => {
+    if (state?.error) {
+      toast.error('An error has occurred', {
+        description: state.error,
+        action: { label: 'Close', onClick: () => {} },
+      });
+    }
+  }, [state]);
+
+  React.useEffect(() => {
+    if (state?.success) {
+      toast.success('Success!', {
+        description: state.success,
+        action: { label: 'Close', onClick: () => {} },
+      });
+      setOpenDrawer(false);
+    }
+  }, [state?.success]);
+
+  const handleOpenDrawer = () => {
+    setOpenDrawer(!openDrawer);
+    setRemarks('');
+  };
+
+  return (
+    <Dialog open={openDrawer} onOpenChange={handleOpenDrawer}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="data-[state=open]:bg-muted text-muted-foreground flex size-8" size="icon">
@@ -263,441 +593,188 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+          <DialogTrigger asChild>
+            <DropdownMenuItem>Edit Remarks</DropdownMenuItem>
+          </DialogTrigger>
         </DropdownMenuContent>
       </DropdownMenu>
-    ),
-  },
-];
 
-function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.id,
-  });
+      <DialogContent>
+        <form className="flex flex-col gap-4" action={action}>
+          <input type="hidden" name="work_date" value={row.original.work_date} />
+          <input type="hidden" name="employee_id" value={row.original.employee_id} />
 
-  return (
-    <TableRow
-      data-state={row.getIsSelected() && 'selected'}
-      data-dragging={isDragging}
-      ref={setNodeRef}
-      className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition: transition,
-      }}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-      ))}
-    </TableRow>
+          <DialogHeader>
+            <DialogTitle>Edit remarks</DialogTitle>
+            <DialogDescription>Make your changes and save.</DialogDescription>
+          </DialogHeader>
+
+          <div className="text-sm">
+            <p className="mb-3 font-medium">Previous remarks</p>
+            <p className={`${setRemarkColor(row.getValue('remarks'))} w-fit`}>{row.getValue('remarks') ?? '-'}</p>
+          </div>
+
+          <div className="grid gap-3">
+            <Label htmlFor="remarks">Remarks</Label>
+            <Select name="remarks" disabled={pending} onValueChange={setRemarks}>
+              <SelectTrigger id="remarks" className="w-full">
+                <SelectValue placeholder="Select a remark" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(Remarks).map((remark) => (
+                  <SelectItem key={remark} value={remark}>
+                    {remark}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {remarks === Remarks.SpecifyOtherRemark && (
+              <Input
+                type="text"
+                name="other_remarks"
+                placeholder="e.g. doctor’s appointment"
+                disabled={pending}
+                autoComplete="off"
+                required
+              />
+            )}
+          </div>
+
+          <DialogFooter className="sm:flex-col-reverse">
+            <DialogClose asChild>
+              <Button type="button" variant="outline" disabled={pending}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={pending}>
+              {pending ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-export function DataTable({ data: initialData }: { data: z.infer<typeof schema>[] }) {
-  const [data, setData] = React.useState(() => initialData);
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const sortableId = React.useId();
-  const sensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
+function RowMenuAdmin(row: Row<AttendanceRecord | AttendanceRecordWithUserDetails>) {
+  const [openDialog, setOpenDialog] = React.useState(false);
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(() => data?.map(({ id }) => id) || [], [data]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-      pagination,
-    },
-    getRowId: (row) => row.id.toString(),
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+  const [state, action, pending] = React.useActionState<ActionState, FormData>(deleteRecord, {
+    error: '',
   });
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (active && over && active.id !== over.id) {
-      setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id);
-        const newIndex = dataIds.indexOf(over.id);
-        return arrayMove(data, oldIndex, newIndex);
+  React.useEffect(() => {
+    if (state?.error) {
+      toast.error('An error has occurred', {
+        description: state.error,
+        action: { label: 'Close', onClick: () => {} },
       });
     }
-  }
+  }, [state]);
 
   return (
-    <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
-      <div className="flex items-center justify-between px-4 lg:px-6">
-        <Label htmlFor="view-selector" className="sr-only">
-          View
-        </Label>
-        <Select defaultValue="outline">
-          <SelectTrigger className="flex w-fit @4xl/main:hidden" size="sm" id="view-selector">
-            <SelectValue placeholder="Select a view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="outline">Outline</SelectItem>
-            <SelectItem value="past-performance">Past Performance</SelectItem>
-            <SelectItem value="key-personnel">Key Personnel</SelectItem>
-            <SelectItem value="focus-documents">Focus Documents</SelectItem>
-          </SelectContent>
-        </Select>
-        <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="outline">Outline</TabsTrigger>
-          <TabsTrigger value="past-performance">
-            Past Performance <Badge variant="secondary">3</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="key-personnel">
-            Key Personnel <Badge variant="secondary">2</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
-        </TabsList>
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconLayoutColumns />
-                <span className="hidden lg:inline">Customize Columns</span>
-                <span className="lg:hidden">Columns</span>
-                <IconChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {table
-                .getAllColumns()
-                .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="outline" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">Add Section</span>
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="data-[state=open]:bg-muted text-muted-foreground flex size-8" size="icon">
+            <IconDotsVertical />
+            <span className="sr-only">Open menu</span>
           </Button>
-        </div>
-      </div>
-      <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-        <div className="overflow-hidden rounded-lg border">
-          <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-            id={sortableId}
-          >
-            <Table>
-              <TableHeader className="bg-muted sticky top-0 z-10">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                {table.getRowModel().rows?.length ? (
-                  <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-                    {table.getRowModel().rows.map((row) => (
-                      <DraggableRow key={row.id} row={row} />
-                    ))}
-                  </SortableContext>
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </DndContext>
-        </div>
-        <div className="flex items-center justify-between px-4">
-          <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-            selected.
-          </div>
-          <div className="flex w-full items-center gap-8 lg:w-fit">
-            <div className="hidden items-center gap-2 lg:flex">
-              <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                Rows per page
-              </Label>
-              <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value));
-                }}
-              >
-                <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                  <SelectValue placeholder={table.getState().pagination.pageSize} />
-                </SelectTrigger>
-                <SelectContent side="top">
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-            </div>
-            <div className="ml-auto flex items-center gap-2 lg:ml-0">
-              <Button
-                variant="outline"
-                className="hidden h-8 w-8 p-0 lg:flex"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to first page</span>
-                <IconChevronsLeft />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-32">
+          <DialogTrigger asChild>
+            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+          </DialogTrigger>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DialogContent>
+        <form className="flex flex-col gap-4" action={action}>
+          <input type="hidden" name="id" value={row.original.id} />
+
+          <DialogHeader>
+            <DialogTitle>Delete this record</DialogTitle>
+            <DialogDescription>Are you sure you want to delete this record?</DialogDescription>
+          </DialogHeader>
+
+          <ul className="flex flex-col flex-wrap gap-4 rounded-md border p-4 text-sm">
+            <li className="flex items-center gap-2">
+              <p className="text-xs">Name:</p>
+              <p className="font-medium">{row.getValue('full_name')}</p>
+            </li>
+            <li className="flex items-center gap-2">
+              <p className="text-xs">Date:</p>
+              <p className="font-medium">{row.getValue('work_date')}</p>
+            </li>
+          </ul>
+
+          <DialogFooter className="sm:flex-row">
+            <DialogClose asChild>
+              <Button type="button" variant="outline" disabled={pending}>
+                Cancel
               </Button>
-              <Button
-                variant="outline"
-                className="size-8"
-                size="icon"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to previous page</span>
-                <IconChevronLeft />
-              </Button>
-              <Button
-                variant="outline"
-                className="size-8"
-                size="icon"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to next page</span>
-                <IconChevronRight />
-              </Button>
-              <Button
-                variant="outline"
-                className="hidden size-8 lg:flex"
-                size="icon"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to last page</span>
-                <IconChevronsRight />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </TabsContent>
-      <TabsContent value="past-performance" className="flex flex-col px-4 lg:px-6">
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent value="focus-documents" className="flex flex-col px-4 lg:px-6">
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-    </Tabs>
+            </DialogClose>
+            <Button variant={'destructive'} type="submit" disabled={pending}>
+              {pending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-const chartData = [
-  { month: 'January', desktop: 186, mobile: 80 },
-  { month: 'February', desktop: 305, mobile: 200 },
-  { month: 'March', desktop: 237, mobile: 120 },
-  { month: 'April', desktop: 73, mobile: 190 },
-  { month: 'May', desktop: 209, mobile: 130 },
-  { month: 'June', desktop: 214, mobile: 140 },
-];
+function MultiSelectDeleteButton(table: TableType<AttendanceRecord | AttendanceRecordWithUserDetails>) {
+  const [openDialog, setOpenDialog] = React.useState(false);
 
-const chartConfig = {
-  desktop: {
-    label: 'Desktop',
-    color: 'var(--primary)',
-  },
-  mobile: {
-    label: 'Mobile',
-    color: 'var(--primary)',
-  },
-} satisfies ChartConfig;
+  const [state, action, pending] = React.useActionState<ActionState, FormData>(deleteMultipleRecords, {
+    error: '',
+  });
 
-function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
-  const isMobile = useIsMobile();
+  React.useEffect(() => {
+    if (state?.error) {
+      toast.error('An error has occurred', {
+        description: state.error,
+        action: { label: 'Close', onClick: () => {} },
+      });
+    }
+  }, [state]);
 
   return (
-    <Drawer direction={isMobile ? 'bottom' : 'right'}>
-      <DrawerTrigger asChild>
-        <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          {item.header}
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      <DialogTrigger asChild>
+        <Button variant={'outline'} size={'sm'} className="text-destructive/75 hover:text-destructive max-w-sm">
+          <Trash />
         </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="gap-1">
-          <DrawerTitle>{item.header}</DrawerTitle>
-          <DrawerDescription>Showing total visitors for the last 6 months</DrawerDescription>
-        </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-          {!isMobile && (
-            <>
-              <ChartContainer config={chartConfig}>
-                <AreaChart
-                  accessibilityLayer
-                  data={chartData}
-                  margin={{
-                    left: 0,
-                    right: 10,
-                  }}
-                >
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                    hide
-                  />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                  <Area
-                    dataKey="mobile"
-                    type="natural"
-                    fill="var(--color-mobile)"
-                    fillOpacity={0.6}
-                    stroke="var(--color-mobile)"
-                    stackId="a"
-                  />
-                  <Area
-                    dataKey="desktop"
-                    type="natural"
-                    fill="var(--color-desktop)"
-                    fillOpacity={0.4}
-                    stroke="var(--color-desktop)"
-                    stackId="a"
-                  />
-                </AreaChart>
-              </ChartContainer>
-              <Separator />
-              <div className="grid gap-2">
-                <div className="flex gap-2 leading-none font-medium">
-                  Trending up by 5.2% this month <IconTrendingUp className="size-4" />
-                </div>
-                <div className="text-muted-foreground">
-                  Showing total visitors for the last 6 months. This is just some random text to test the layout. It
-                  spans multiple lines and should wrap around.
-                </div>
-              </div>
-              <Separator />
-            </>
-          )}
-          <form className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Header</Label>
-              <Input id="header" defaultValue={item.header} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="type">Type</Label>
-                <Select defaultValue={item.type}>
-                  <SelectTrigger id="type" className="w-full">
-                    <SelectValue placeholder="Select a type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Table of Contents">Table of Contents</SelectItem>
-                    <SelectItem value="Executive Summary">Executive Summary</SelectItem>
-                    <SelectItem value="Technical Approach">Technical Approach</SelectItem>
-                    <SelectItem value="Design">Design</SelectItem>
-                    <SelectItem value="Capabilities">Capabilities</SelectItem>
-                    <SelectItem value="Focus Documents">Focus Documents</SelectItem>
-                    <SelectItem value="Narrative">Narrative</SelectItem>
-                    <SelectItem value="Cover Page">Cover Page</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.status}>
-                  <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Done">Done</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Not Started">Not Started</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="target">Target</Label>
-                <Input id="target" defaultValue={item.target} />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="limit">Limit</Label>
-                <Input id="limit" defaultValue={item.limit} />
-              </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="reviewer">Reviewer</Label>
-              <Select defaultValue={item.reviewer}>
-                <SelectTrigger id="reviewer" className="w-full">
-                  <SelectValue placeholder="Select a reviewer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-                  <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
-                  <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </form>
-        </div>
-        <DrawerFooter>
-          <Button>Submit</Button>
-          <DrawerClose asChild>
-            <Button variant="outline">Done</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+      </DialogTrigger>
+      <DialogContent>
+        <form className="flex flex-col gap-4" action={action}>
+          <input
+            type="hidden"
+            name="ids"
+            value={table
+              .getSelectedRowModel()
+              .rows.map((row) => row.original.id)
+              .join(',')}
+          />
+
+          <DialogHeader>
+            <DialogTitle>Delete these records</DialogTitle>
+            <DialogDescription>Are you sure you want to delete these records?</DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="sm:flex-row">
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button variant={'destructive'} type="submit" disabled={pending}>
+              {pending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
