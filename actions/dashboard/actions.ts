@@ -243,7 +243,7 @@ const deleteMultipleRecordsSchema = z.object({
   ids: z
     .string()
     .transform((val) => val.split(','))
-    .pipe(z.array(z.string().min(1))),
+    .pipe(z.array(z.coerce.number().min(1))),
 });
 
 export const deleteMultipleRecords = validatedAction(deleteMultipleRecordsSchema, async (data) => {
