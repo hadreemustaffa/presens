@@ -84,32 +84,53 @@ export type Database = {
       attendance_summaries: {
         Row: {
           avg_daily_hours: number;
+          avg_lunch_minutes: number | null;
+          created_at: string;
           employee_id: string | null;
-          generated_at: string;
+          home_days: number;
           id: number;
+          leave_dates: Json | null;
+          leave_days: number | null;
+          leave_rate: number | null;
           month: number;
+          office_days: number;
           total_days: number;
           total_hours: number;
+          updated_at: string | null;
           year: number;
         };
         Insert: {
           avg_daily_hours: number;
+          avg_lunch_minutes?: number | null;
+          created_at?: string;
           employee_id?: string | null;
-          generated_at?: string;
+          home_days?: number;
           id?: number;
+          leave_dates?: Json | null;
+          leave_days?: number | null;
+          leave_rate?: number | null;
           month: number;
+          office_days?: number;
           total_days: number;
           total_hours: number;
+          updated_at?: string | null;
           year: number;
         };
         Update: {
           avg_daily_hours?: number;
+          avg_lunch_minutes?: number | null;
+          created_at?: string;
           employee_id?: string | null;
-          generated_at?: string;
+          home_days?: number;
           id?: number;
+          leave_dates?: Json | null;
+          leave_days?: number | null;
+          leave_rate?: number | null;
           month?: number;
+          office_days?: number;
           total_days?: number;
           total_hours?: number;
+          updated_at?: string | null;
           year?: number;
         };
         Relationships: [
@@ -121,6 +142,69 @@ export type Database = {
             referencedColumns: ['employee_id'];
           },
         ];
+      };
+      cron_job_logs: {
+        Row: {
+          created_at: string;
+          details: Json | null;
+          duration_seconds: number | null;
+          employees_processed: number | null;
+          end_time: string | null;
+          error_message: string | null;
+          id: number;
+          job_name: string;
+          records_processed: number | null;
+          start_time: string;
+          status: string;
+        };
+        Insert: {
+          created_at?: string;
+          details?: Json | null;
+          duration_seconds?: number | null;
+          employees_processed?: number | null;
+          end_time?: string | null;
+          error_message?: string | null;
+          id?: number;
+          job_name: string;
+          records_processed?: number | null;
+          start_time?: string;
+          status: string;
+        };
+        Update: {
+          created_at?: string;
+          details?: Json | null;
+          duration_seconds?: number | null;
+          employees_processed?: number | null;
+          end_time?: string | null;
+          error_message?: string | null;
+          id?: number;
+          job_name?: string;
+          records_processed?: number | null;
+          start_time?: string;
+          status?: string;
+        };
+        Relationships: [];
+      };
+      public_holidays: {
+        Row: {
+          created_at: string | null;
+          date: string;
+          id: number;
+          name: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          date: string;
+          id?: number;
+          name: string;
+        };
+        Update: {
+          created_at?: string | null;
+          date?: string;
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
       };
       role_permissions: {
         Row: {
@@ -223,6 +307,44 @@ export type Database = {
           },
         ];
       };
+      cron_job_logs_summary: {
+        Row: {
+          avg_duration_seconds: number | null;
+          failed_runs: number | null;
+          job_name: string | null;
+          last_failed_run: string | null;
+          last_run: string | null;
+          last_successful_run: string | null;
+          success_rate_percent: number | null;
+          successful_runs: number | null;
+          total_runs: number | null;
+        };
+        Relationships: [];
+      };
+      employee_analytics_summary_all_time_view: {
+        Row: {
+          avg_daily_hours: number | null;
+          avg_lunch_minutes: number | null;
+          employee_id: string | null;
+          home_days: number | null;
+          leave_dates: Json | null;
+          leave_days: number | null;
+          leave_rate_percent: number | null;
+          office_days: number | null;
+          required_workdays: number | null;
+          total_days: number | null;
+          total_hours: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'attendance_records_employee_id_fkey';
+            columns: ['employee_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['employee_id'];
+          },
+        ];
+      };
     };
     Functions: {
       authorize: {
@@ -230,6 +352,10 @@ export type Database = {
           requested_permission: Database['public']['Enums']['app_permission'];
         };
         Returns: boolean;
+      };
+      cleanup_cron_job_logs: {
+        Args: { days_to_keep?: number };
+        Returns: number;
       };
       create_user: {
         Args: { email: string };
@@ -241,6 +367,22 @@ export type Database = {
       };
       delete_user: {
         Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      generate_attendance_seed: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      update_attendance_summaries: {
+        Args: { p_employee_id?: string };
+        Returns: undefined;
+      };
+      update_attendance_summaries_with_logging: {
+        Args: { p_employee_id?: string };
+        Returns: Json;
+      };
+      update_employee_monthly_summaries: {
+        Args: { p_employee_id: string };
         Returns: undefined;
       };
     };
