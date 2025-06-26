@@ -35,7 +35,6 @@ export type Database = {
           created_at: string;
           employee_id: string;
           id: number;
-          is_on_leave: boolean;
           lunch_in: string | null;
           lunch_out: string | null;
           remarks: string | null;
@@ -49,7 +48,6 @@ export type Database = {
           created_at?: string;
           employee_id: string;
           id?: number;
-          is_on_leave?: boolean;
           lunch_in?: string | null;
           lunch_out?: string | null;
           remarks?: string | null;
@@ -63,7 +61,6 @@ export type Database = {
           created_at?: string;
           employee_id?: string;
           id?: number;
-          is_on_leave?: boolean;
           lunch_in?: string | null;
           lunch_out?: string | null;
           remarks?: string | null;
@@ -290,7 +287,6 @@ export type Database = {
           employee_id: string | null;
           full_name: string | null;
           id: number | null;
-          is_on_leave: boolean | null;
           lunch_in: string | null;
           lunch_out: string | null;
           remarks: string | null;
@@ -323,21 +319,32 @@ export type Database = {
       };
       employee_analytics_summary_all_time_view: {
         Row: {
+          attendance_rate: number | null;
+          avg_clock_in_time: string | null;
+          avg_clock_out_time: string | null;
           avg_daily_hours: number | null;
           avg_lunch_minutes: number | null;
+          clock_in_consistency_minutes: number | null;
           employee_id: string | null;
           home_days: number | null;
+          home_work_dates: Json | null;
+          home_work_percentage: number | null;
+          incomplete_records_dates: Json | null;
           leave_dates: Json | null;
           leave_days: number | null;
-          leave_rate_percent: number | null;
+          leave_rate: number | null;
           office_days: number | null;
+          office_work_dates: Json | null;
+          office_work_percentage: number | null;
+          preferred_home_days: Json | null;
+          public_holidays_dates: Json | null;
           required_workdays: number | null;
           total_days: number | null;
           total_hours: number | null;
         };
         Relationships: [
           {
-            foreignKeyName: 'attendance_records_employee_id_fkey';
+            foreignKeyName: 'attendance_summaries_employee_id_fkey';
             columns: ['employee_id'];
             isOneToOne: false;
             referencedRelation: 'users';
@@ -373,6 +380,14 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
       };
+      get_daily_hours_record: {
+        Args: {
+          p_employee_id: string;
+          p_start_date?: string;
+          p_end_date?: string;
+        };
+        Returns: Json;
+      };
       update_attendance_summaries: {
         Args: { p_employee_id?: string };
         Returns: undefined;
@@ -394,7 +409,9 @@ export type Database = {
         | 'attendance_records.delete'
         | 'attendance_summaries.select'
         | 'attendance_summaries.delete'
-        | 'attendance_records.update';
+        | 'attendance_records.update'
+        | 'attendance_summaries.update'
+        | 'attendance_summaries.insert';
       app_roles: 'admin';
       work_mode: 'office' | 'home';
     };
@@ -513,6 +530,8 @@ export const Constants = {
         'attendance_summaries.select',
         'attendance_summaries.delete',
         'attendance_records.update',
+        'attendance_summaries.update',
+        'attendance_summaries.insert',
       ],
       app_roles: ['admin'],
       work_mode: ['office', 'home'],

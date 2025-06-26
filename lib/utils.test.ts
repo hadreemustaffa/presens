@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { LUNCH_HOURS, WORK_HOURS } from '@/lib/constants';
+import { LUNCH_HOURS, FULL_DAY_WORK_HOURS } from '@/lib/constants';
 import { getRemainingWorkHours } from '@/lib/utils';
 
 dayjs.extend(isBetween);
@@ -70,8 +70,8 @@ describe('getRemainingWorkHours', () => {
       const result = getRemainingWorkHours('09:00:00');
 
       // At 14:30, with work day starting at 09:00
-      // 5.5 hours have passed, so remaining = (WORK_HOURS + LUNCH_HOURS) - 5.5
-      const expectedHours = Math.floor(WORK_HOURS + LUNCH_HOURS - 5.5);
+      // 5.5 hours have passed, so remaining = (FULL_DAY_WORK_HOURS + LUNCH_HOURS) - 5.5
+      const expectedHours = Math.floor(FULL_DAY_WORK_HOURS + LUNCH_HOURS - 5.5);
       const expectedMinutes = 30;
 
       expect(result.hours).toBe(expectedHours);

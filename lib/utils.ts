@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { twMerge } from 'tailwind-merge';
 
-import { LUNCH_HOURS, WORK_HOURS } from '@/lib/constants';
+import { LUNCH_HOURS, FULL_DAY_WORK_HOURS } from '@/lib/constants';
 
 dayjs.extend(isBetween);
 
@@ -43,9 +43,9 @@ export function getTimeOfDayAbbr(time: string) {
  * @param {string} format - Format string for dayjs.
  * @returns Formatted string.
  */
-export const formatTime = (timestamp: string, format: string) => {
+export function formatTime(timestamp: string, format: string) {
   return dayjs(timestamp).format(`${format}`);
-};
+}
 
 /**
  * Formats a timestamp string into a human-readable format, assuming the timestamp is in the current day.
@@ -53,10 +53,10 @@ export const formatTime = (timestamp: string, format: string) => {
  * @param {string} format - Format string for dayjs.
  * @returns Formatted string.
  */
-export const formatTimeToday = (timestamp: string, format?: string) => {
+export function formatTimeToday(timestamp: string, format?: string) {
   const today = dayjs().format('YYYY-MM-DD');
   return dayjs(`${today} ${timestamp}`).format(`${format}`);
-};
+}
 
 /**
  * Converts a timestamp string in the format of HH:mm:ss to a dayjs object
@@ -64,10 +64,10 @@ export const formatTimeToday = (timestamp: string, format?: string) => {
  * @param {string} timestamp - Timestamp string in HH:mm:ss format.
  * @returns A dayjs object of the current day.
  */
-export const convertTimeTodayToDayjs = (timestamp: string) => {
+export function convertTimeTodayToDayjs(timestamp: string) {
   const today = dayjs().format('YYYY-MM-DD');
   return dayjs(`${today} ${timestamp}`);
-};
+}
 
 /**
  * Calculates the remaining work hours, given the start time of the work day.
@@ -75,13 +75,13 @@ export const convertTimeTodayToDayjs = (timestamp: string) => {
  * @param {string} time - Optional timestamp to start counting down from in HH:mm:ss format, if not provided, the current time will be used.
  * @returns An object with properties `hours`, `minutes`, and `seconds` representing the remaining time.
  */
-export const getRemainingWorkHours = (workStart: string, time?: string) => {
+export function getRemainingWorkHours(workStart: string, time?: string) {
   if (!time) {
     time = dayjs().format('HH:mm:ss');
   }
 
   const startTime = convertTimeTodayToDayjs(workStart);
-  const endTime = startTime.add(WORK_HOURS + LUNCH_HOURS, 'hours');
+  const endTime = startTime.add(FULL_DAY_WORK_HOURS + LUNCH_HOURS, 'hours');
   const convertedTime = convertTimeTodayToDayjs(time);
 
   const totalSeconds = endTime.diff(convertedTime, 'seconds');
@@ -95,8 +95,8 @@ export const getRemainingWorkHours = (workStart: string, time?: string) => {
   const seconds = totalSeconds % 60;
 
   return { hours, minutes, seconds };
-};
+}
 
-export const capitalizeFirstLetter = (str: string) => {
+export function capitalizeFirstLetter(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
-};
+}

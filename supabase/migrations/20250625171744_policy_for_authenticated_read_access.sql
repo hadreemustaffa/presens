@@ -1,0 +1,1 @@
+create policy "Allow authenticated read access" on public.public_holidays for select to authenticated using (true);
