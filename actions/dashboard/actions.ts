@@ -125,7 +125,8 @@ export const lunchIn = async () => {
     .update({
       lunch_in: dayjs().format('HH:mm:ss'),
     })
-    .eq('employee_id', user.user_metadata.employee_id);
+    .eq('employee_id', user.user_metadata.employee_id)
+    .eq('work_date', dayjs().format('YYYY-MM-DD'));
 
   if (error) {
     console.log(error);
