@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { usePathname } from 'next/navigation';
 
 import { navLinks } from '@/components/app-sidebar';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export function SiteHeader() {
@@ -26,7 +27,10 @@ export function SiteHeader() {
           <SidebarTrigger size={'icon'} />
           <p>{currentPath?.title}</p>
         </div>
-        <p>{today}</p>
+        <div className="flex items-center gap-4">
+          <p>{today}</p>
+          <ThemeSwitcher />
+        </div>
       </div>
     </header>
   );

@@ -8,7 +8,7 @@ import StatusCard from '@/components/status-card';
 import { UserMetadata } from '@/types/interfaces';
 
 export default async function DashboardPage() {
-  const { user, isAdmin } = await getActiveUser();
+  const { user } = await getActiveUser();
   const userMetadata = user.user_metadata as UserMetadata;
 
   const record = await getAttendanceRecord({

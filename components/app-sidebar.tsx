@@ -8,7 +8,6 @@ import * as React from 'react';
 import { NavMain } from '@/components/nav-main';
 import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
-import { ThemeSwitcher } from '@/components/theme-switcher';
 import {
   Sidebar,
   SidebarContent,
@@ -57,17 +56,16 @@ export function AppSidebar({ user, ...props }: AppSideBarProps) {
   };
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center justify-between gap-2">
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="#">
                 <Clock className="!size-5" />
-                <span className="text-base font-semibold">Presens</span>
+                <span className="text-base font-semibold">PRESENS</span>
               </a>
             </SidebarMenuButton>
-            <ThemeSwitcher />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
