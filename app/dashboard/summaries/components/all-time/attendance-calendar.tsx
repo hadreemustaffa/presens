@@ -214,7 +214,7 @@ export default function AttendanceCalendar({
           <p>Attendance Calendar</p>
           <CalendarLegend />
         </CardDescription>
-        <CardTitle className="flex items-center justify-between text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+        <CardTitle className="flex items-center justify-between text-2xl font-semibold tabular-nums">
           {monthNames[currentMonth]} {currentYear}
           <div className="flex items-center space-x-2">
             <Button variant={'outline'} size={'sm'} onClick={() => navigateMonth('prev')}>

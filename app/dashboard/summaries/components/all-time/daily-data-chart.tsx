@@ -75,7 +75,7 @@ export function DailyDataChart({ record }: { record: Promise<DailyHoursRecord[]>
           })}
         </div>
       </CardHeader>
-      <CardContent className="h-full place-content-center px-2 sm:p-6">
+      <CardContent className="h-full place-content-center px-2 sm:p-6 sm:pb-0">
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
           <BarChart
             accessibilityLayer
@@ -104,7 +104,6 @@ export function DailyDataChart({ record }: { record: Promise<DailyHoursRecord[]>
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
-                  nameKey="views"
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString('en-US', {
                       month: 'short',
@@ -119,6 +118,17 @@ export function DailyDataChart({ record }: { record: Promise<DailyHoursRecord[]>
           </BarChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-2 px-6 pb-6 text-sm">
+        <div className="flex gap-2 leading-none font-medium">
+          Averaging around{' '}
+          {activeChart === 'hours_worked' ? (
+            <>{(total.hours_worked / dailyRecords.length).toFixed(1)} hours daily</>
+          ) : (
+            <>{Math.round(total.lunch_taken_minutes / dailyRecords.length)} minutes daily</>
+          )}
+        </div>
+        <div className="text-muted-foreground leading-none">Showing total visitors for the last 6 months</div>
+      </CardFooter>
     </Card>
   );
 }

@@ -24,24 +24,30 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function WorkModeChart(summary: AllTimeAttendanceSummary) {
+export function WorkModeChart({
+  home_days,
+  home_work_percentage,
+  office_days,
+  office_work_percentage,
+  total_days,
+}: Pick<
+  AllTimeAttendanceSummary,
+  'home_days' | 'home_work_percentage' | 'office_days' | 'office_work_percentage' | 'total_days'
+>) {
   const chartData = [
-    { work_mode: 'Home', days: summary.home_days, fill: 'var(--color-home)' },
-    { work_mode: 'Office', days: summary.office_days, fill: 'var(--color-office)' },
+    { work_mode: 'Home', days: home_days, fill: 'var(--color-home)' },
+    { work_mode: 'Office', days: office_days, fill: 'var(--color-office)' },
   ];
 
-  const { chartSummary, note } = evaluateWorkModePolicyCompliance(
-    summary.home_work_percentage,
-    summary.office_work_percentage,
-  );
+  const { chartSummary, note } = evaluateWorkModePolicyCompliance(home_work_percentage, office_work_percentage);
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex h-full flex-col">
       <CardHeader className="items-center pb-0">
         <CardDescription>Work Mode Distribution</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
+      <CardContent className="flex h-full flex-1 items-center justify-center pb-0">
+        <ChartContainer config={chartConfig} className="aspect-square max-h-[250px] w-full">
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <Pie data={chartData} dataKey="days" nameKey="work_mode" innerRadius={60} strokeWidth={5}>
@@ -51,7 +57,7 @@ export function WorkModeChart(summary: AllTimeAttendanceSummary) {
                     return (
                       <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
                         <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
-                          {summary.total_days}
+                          {total_days}
                         </tspan>
                         <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
                           Working Days

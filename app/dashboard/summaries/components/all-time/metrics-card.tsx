@@ -39,6 +39,8 @@ export function MetricsCard(summary: AllTimeAttendanceSummary) {
 }
 
 const AverageDailyWorkHoursCard = ({ avg_daily_hours }: Pick<AllTimeAttendanceSummary, 'avg_daily_hours'>) => {
+  const isNull = avg_daily_hours === null;
+
   const avgDailyWorkHours = dayjs.duration(avg_daily_hours, 'hours');
 
   let footerSummary: string;
@@ -60,21 +62,29 @@ const AverageDailyWorkHoursCard = ({ avg_daily_hours }: Pick<AllTimeAttendanceSu
       <CardHeader>
         <CardDescription>Average Daily Work Hours</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          {avgDailyWorkHours.hours()}
-          <span className="text-primary">h</span>
-          {avgDailyWorkHours.minutes()}
-          <span className="text-primary">m</span>
+          {isNull ? (
+            'N/A'
+          ) : (
+            <>
+              {avgDailyWorkHours.hours()}
+              <span className="text-primary">h</span>
+              {avgDailyWorkHours.minutes()}
+              <span className="text-primary">m</span>
+            </>
+          )}
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex-col items-start gap-1.5 text-sm">
-        <p className="line-clamp-1 flex gap-2 font-medium">{footerSummary}</p>
-        <p className="text-muted-foreground">{footerSubSummary}</p>
+        <p className="line-clamp-1 flex gap-2 font-medium">{isNull ? '-' : footerSummary}</p>
+        <p className="text-muted-foreground">{isNull ? 'Insufficient data' : footerSubSummary}</p>
       </CardFooter>
     </Card>
   );
 };
 
 const AverageLunchCard = ({ avg_lunch_minutes }: Pick<AllTimeAttendanceSummary, 'avg_lunch_minutes'>) => {
+  const isNull = avg_lunch_minutes === null;
+
   const average = Math.round(avg_lunch_minutes);
   const avgDailyWorkHours = dayjs.duration(average, 'minutes');
 
@@ -97,14 +107,20 @@ const AverageLunchCard = ({ avg_lunch_minutes }: Pick<AllTimeAttendanceSummary, 
       <CardHeader>
         <CardDescription>Average Lunch Duration</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          {avgDailyWorkHours.hours()}
-          <span className="text-primary">h</span> {avgDailyWorkHours.minutes()}
-          <span className="text-primary">m</span>
+          {isNull ? (
+            'N/A'
+          ) : (
+            <>
+              {avgDailyWorkHours.hours()}
+              <span className="text-primary">h</span> {avgDailyWorkHours.minutes()}
+              <span className="text-primary">m</span>
+            </>
+          )}
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex-col items-start gap-1.5 text-sm">
-        <p className="line-clamp-1 flex gap-2 font-medium">{footerSummary}</p>
-        <p className="text-muted-foreground">{footerSubSummary}</p>
+        <p className="line-clamp-1 flex gap-2 font-medium">{isNull ? '-' : footerSummary}</p>
+        <p className="text-muted-foreground">{isNull ? 'Insufficient data' : footerSubSummary}</p>
       </CardFooter>
     </Card>
   );
@@ -115,6 +131,8 @@ const AttendanceRateCard = ({
   total_days,
   required_workdays,
 }: Pick<AllTimeAttendanceSummary, 'attendance_rate' | 'total_days' | 'required_workdays'>) => {
+  const isNull = attendance_rate === null;
+
   let footerSummary: string;
   if (attendance_rate > ATTENDANCE_RATE_MIN_THRESHOLD_PERCENT) {
     footerSummary = 'Consistently present';
@@ -124,6 +142,8 @@ const AttendanceRateCard = ({
     footerSummary = 'Good overall work presence';
   }
 
+  const formatPercentage = `${attendance_rate.toFixed(1)}`;
+
   const footerSubSummary = `Worked ${total_days} of ${required_workdays} days`;
 
   return (
@@ -131,15 +151,19 @@ const AttendanceRateCard = ({
       <CardHeader>
         <CardDescription>Attendance Rate</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          <p>
-            {attendance_rate.toFixed(1)}
-            <span className="text-primary">%</span>
-          </p>
+          {isNull ? (
+            'N/A'
+          ) : (
+            <p>
+              {formatPercentage}
+              <span className="text-primary">%</span>
+            </p>
+          )}
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex-col items-start gap-1.5 text-sm">
-        <p className="line-clamp-1 flex gap-2 font-medium">{footerSummary}</p>
-        <p className="text-muted-foreground">{footerSubSummary}</p>
+        <p className="line-clamp-1 flex gap-2 font-medium">{isNull ? '-' : footerSummary}</p>
+        <p className="text-muted-foreground">{isNull ? 'Insufficient data' : footerSubSummary}</p>
       </CardFooter>
     </Card>
   );
@@ -149,6 +173,8 @@ const ClockInConsistencyCard = ({
   clock_in_consistency_minutes,
   avg_clock_in_time,
 }: Pick<AllTimeAttendanceSummary, 'clock_in_consistency_minutes' | 'avg_clock_in_time'>) => {
+  const isNull = clock_in_consistency_minutes === null;
+
   const now = dayjs().format('YYYY MM DD');
   const clockInDurationMinutes = dayjs.duration(clock_in_consistency_minutes, 'minutes');
   const minClockIn = dayjs(`${now} ${avg_clock_in_time}`).format('HH:mma');
@@ -171,14 +197,20 @@ const ClockInConsistencyCard = ({
       <CardHeader>
         <CardDescription>Clock In Consistency</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          {clockInDurationMinutes.hours()}
-          <span className="text-primary">h</span> {clockInDurationMinutes.minutes()}
-          <span className="text-primary">m</span>
+          {isNull ? (
+            'N/A'
+          ) : (
+            <>
+              {clockInDurationMinutes.hours()}
+              <span className="text-primary">h</span> {clockInDurationMinutes.minutes()}
+              <span className="text-primary">m</span>
+            </>
+          )}
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex-col items-start gap-1.5 text-sm">
-        <div className="line-clamp-1 flex gap-2 font-medium">{footerSummary}</div>
-        <div className="text-muted-foreground">{footerSubSummary}</div>
+        <div className="line-clamp-1 flex gap-2 font-medium">{isNull ? '-' : footerSummary}</div>
+        <div className="text-muted-foreground">{isNull ? 'Insufficient data' : footerSubSummary}</div>
       </CardFooter>
     </Card>
   );

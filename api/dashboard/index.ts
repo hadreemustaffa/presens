@@ -86,7 +86,7 @@ export const getAllTimeSummary = async ({ employee_id }: { employee_id: string }
     .from('employee_analytics_summary_all_time_view')
     .select()
     .eq('employee_id', employee_id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error(error);
