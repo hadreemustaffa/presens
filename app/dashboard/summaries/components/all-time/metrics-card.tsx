@@ -179,7 +179,7 @@ const ClockInConsistencyCard = ({
   const clockInDurationMinutes = dayjs.duration(clock_in_consistency_minutes, 'minutes');
   const minClockIn = dayjs(`${now} ${avg_clock_in_time}`).format('HH:mma');
   const maxClockIn = dayjs(`${now} ${avg_clock_in_time}`)
-    .add(clockInDurationMinutes.minutes(), 'minutes')
+    .add(clockInDurationMinutes.asMinutes(), 'minutes')
     .format('HH:mma');
 
   let footerSummary: string;
