@@ -16,7 +16,7 @@ const chartConfig = {
   },
   home: {
     label: 'Home',
-    color: 'var(--foreground)',
+    color: 'var(--chart-1)',
   },
   office: {
     label: 'Office',

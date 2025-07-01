@@ -128,7 +128,7 @@ export default function AttendanceCalendar({
       case 'home':
         return `${baseStyles} bg-green-800/10 border-green-800/50 hover:bg-green-800/50 ${opacityClass}`;
       case 'leave':
-        return `${baseStyles} bg-primary/10 border-primary/50 hover:bg-primary/50 ${opacityClass}`;
+        return `${baseStyles} bg-red-800/10 border-red-800/50 hover:bg-red-800/50 ${opacityClass}`;
       case 'weekend':
         return `${baseStyles} text-gray-500 ${opacityClass}`;
       case 'holiday':

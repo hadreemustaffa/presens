@@ -1,47 +1,50 @@
 import { ArrowRightFromLine, ArrowRightToLine, Coffee } from 'lucide-react';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatTimeToday, getTimeOfDayAbbr } from '@/lib/utils';
 import { AttendanceRecord } from '@/types/interfaces';
 
 export function ActivityCards(record: AttendanceRecord) {
   return (
-    <div className="@container flex h-fit flex-col gap-4 rounded-md border p-4">
-      <h2 className="text-xl font-bold">Today&apos;s Activity</h2>
-      <div className="grid grid-cols-1 gap-4 @[640px]:grid-cols-2">
+    <Card className="@container/card">
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle>Today&apos;s Activity</CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 gap-4 @[640px]/card:grid-cols-2">
         {record.clock_in && (
-          <Card
+          <Activity
             title="Clocked In"
             time={record.clock_in}
             icon={<ArrowRightToLine className="h-5 w-5 text-green-500 sm:h-7 sm:w-7" />}
           />
         )}
         {record.lunch_out && (
-          <Card
+          <Activity
             title="On Lunch Break"
             time={record.lunch_out}
             icon={<Coffee className="h-5 w-5 text-yellow-500 sm:h-7 sm:w-7" />}
           />
         )}
         {record.lunch_in && (
-          <Card
+          <Activity
             title="Returned from Lunch"
             time={record.lunch_in}
             icon={<Coffee className="h-5 w-5 text-blue-500 sm:h-7 sm:w-7" />}
           />
         )}
         {record.clock_out && (
-          <Card
+          <Activity
             title="Clocked Out"
             time={record.clock_out}
             icon={<ArrowRightFromLine className="text-primary h-5 w-5 sm:h-7 sm:w-7" />}
           />
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
-const Card = ({ title, time, icon }: { title: string; time: string; icon?: React.ReactNode }) => {
+const Activity = ({ title, time, icon }: { title: string; time: string; icon?: React.ReactNode }) => {
   return (
     <div className="flex flex-row items-center justify-between gap-4 rounded-md border px-4 py-2">
       <div className="hidden sm:block">{icon}</div>

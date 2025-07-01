@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { useEffect, useState } from 'react';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { convertTimeTodayToDayjs, getRemainingWorkHours, getTimeOfDayAbbr } from '@/lib/utils';
 import { AttendanceRecord } from '@/types/interfaces';
 
@@ -48,15 +49,15 @@ export default function StatusCard(record: AttendanceRecord) {
   const timeAbbr = getTimeOfDayAbbr(expectedEnd);
 
   return (
-    <div className="rounded-md border p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-bold">Current Status</h3>
+    <Card className="@container/card">
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle>Current Status</CardTitle>
         <div className={`rounded-full px-3 py-1 text-sm font-medium ${statusInfo.bgColor} ${statusInfo.textColor}`}>
           {statusInfo.label}
         </div>
-      </div>
+      </CardHeader>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 @[768px]/main:grid-cols-2">
+      <CardContent className="grid grid-cols-1 gap-4 @[400px]/card:grid-cols-2 @[768px]/main:grid-cols-2">
         <TimeRemainingStatus {...record} />
         <div>
           <p className="mb-1 text-sm">Expected End</p>
@@ -69,8 +70,8 @@ export default function StatusCard(record: AttendanceRecord) {
             <p className="text-lg font-bold">N/A</p>
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 

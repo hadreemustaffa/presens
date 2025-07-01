@@ -37,7 +37,7 @@ export default async function Page() {
         <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
         <div className="flex h-full flex-col items-center justify-center gap-2 rounded-md border">
           <p>
-            You’ll see summaries here once you have {MIN_DAYS_FOR_SUMMARIES - summary.total_days} more days of
+            You&apos;ll see summaries here once you have {MIN_DAYS_FOR_SUMMARIES - summary.total_days} more days of
             attendance.
           </p>
           <p>This ensures your insights are relevant and informative.</p>

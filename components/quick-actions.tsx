@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { lunchIn, lunchOut } from '@/actions/dashboard/actions';
 import ClockOutForm from '@/components/forms/clock-out-form';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ActionState } from '@/lib/middleware';
 import { AttendanceRecord } from '@/types/interfaces';
@@ -38,9 +39,9 @@ export default function QuickActions(record: AttendanceRecord) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div className="flex flex-col gap-4 rounded-md border p-4">
-        <h2 className="text-xl font-bold">Quick Actions</h2>
-        <div className="grid grid-cols-1 justify-between gap-4 sm:grid-cols-2">
+      <Card className="flex flex-col gap-4 rounded-md border p-4">
+        <CardTitle>Quick Actions</CardTitle>
+        <CardContent className="grid grid-cols-1 justify-between gap-4 px-0 sm:grid-cols-2">
           <DialogTrigger asChild>
             <Button
               size={'lg'}
@@ -61,13 +62,13 @@ export default function QuickActions(record: AttendanceRecord) {
               !record.lunch_in && (
                 <form>
                   <Button
-                    variant={'secondary'}
+                    variant={'outline'}
                     size={'lg'}
                     formAction={lunchInAction}
                     className="w-full"
                     disabled={lunchInPending}
                   >
-                    <Coffee size={20} />
+                    <Coffee size={20} className="text-blue-500" />
                     Lunch In
                   </Button>
                 </form>
@@ -75,19 +76,19 @@ export default function QuickActions(record: AttendanceRecord) {
             ) : (
               <form>
                 <Button
-                  variant={'secondary'}
+                  variant={'outline'}
                   size={'lg'}
                   formAction={lunchOutAction}
                   className="w-full"
                   disabled={lunchOutPending}
                 >
-                  <Coffee size={20} />
+                  <Coffee size={20} className="text-yellow-500" />
                   Lunch Out
                 </Button>
               </form>
             ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </Dialog>
   );
 }
