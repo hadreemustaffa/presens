@@ -13,11 +13,11 @@ import {
   ATTENDANCE_RATE_MIN_THRESHOLD_PERCENT,
   ATTENDANCE_RATE_MAX_THRESHOLD_PERCENT,
 } from '@/lib/constants';
-import { AllTimeAttendanceSummary } from '@/types/interfaces';
+import { AllTimeAttendanceSummary } from '@/lib/types/interfaces';
 
 dayjs.extend(duration);
 
-export function MetricsCard(summary: AllTimeAttendanceSummary) {
+export default function MetricsCard(summary: AllTimeAttendanceSummary) {
   return (
     <div className="grid grid-cols-1 gap-4 @2xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <AverageDailyWorkHoursCard avg_daily_hours={summary.avg_daily_hours} />

@@ -1,7 +1,9 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AllTimeAttendanceSummary } from '@/types/interfaces';
+import { AllTimeAttendanceSummary } from '@/lib/types/interfaces';
 
-export function PreferredHomeDaysCard({ preferred_home_days }: Pick<AllTimeAttendanceSummary, 'preferred_home_days'>) {
+export default function PreferredHomeDaysCard({
+  preferred_home_days,
+}: Pick<AllTimeAttendanceSummary, 'preferred_home_days'>) {
   return (
     <Card className="@container/card">
       <CardHeader>

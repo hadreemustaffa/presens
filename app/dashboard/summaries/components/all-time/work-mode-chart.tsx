@@ -5,7 +5,7 @@ import { Label, Pie, PieChart } from 'recharts';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { evaluateWorkModePolicyCompliance } from '@/lib/dashboard/utils';
-import { AllTimeAttendanceSummary } from '@/types/interfaces';
+import { AllTimeAttendanceSummary } from '@/lib/types/interfaces';
 
 const chartConfig = {
   work_mode: {
@@ -24,7 +24,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function WorkModeChart({
+export default function WorkModeChart({
   home_days,
   home_work_percentage,
   office_days,

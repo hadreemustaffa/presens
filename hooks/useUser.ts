@@ -20,6 +20,7 @@ export function useUser() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
+
   return {
     user,
     isLoading,

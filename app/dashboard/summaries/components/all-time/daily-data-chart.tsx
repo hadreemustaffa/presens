@@ -2,12 +2,12 @@
 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { use, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Bar, CartesianGrid, BarChart, XAxis } from 'recharts';
 
-import { DailyHoursRecord } from '@/api/dashboard';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { DailyDataRecord } from '@/lib/types/interfaces';
 
 dayjs.extend(duration);
 
@@ -27,18 +27,17 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function DailyDataChart({ record }: { record: Promise<DailyHoursRecord[]> }) {
+export default function DailyDataChart({ record }: { record: DailyDataRecord[] }) {
   const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>('hours_worked');
-  const dailyRecords = use(record);
 
   const chartData = useMemo(
     () =>
-      dailyRecords.map((record) => ({
+      record.map((record) => ({
         date: record.date,
         hours_worked: record.hours_worked,
         lunch_taken_minutes: record.lunch_taken_minutes,
       })),
-    [dailyRecords],
+    [record],
   );
 
   const total = useMemo(
@@ -128,9 +127,9 @@ export function DailyDataChart({ record }: { record: Promise<DailyHoursRecord[]>
         <p className="flex gap-2 leading-none font-medium">
           Averaging around{' '}
           {activeChart === 'hours_worked' ? (
-            <>{(total.hours_worked / dailyRecords.length).toFixed(1)} hours daily</>
+            <>{(total.hours_worked / record.length).toFixed(1)} hours daily</>
           ) : (
-            <>{Math.round(total.lunch_taken_minutes / dailyRecords.length)} minutes daily</>
+            <>{Math.round(total.lunch_taken_minutes / record.length)} minutes daily</>
           )}
         </p>
         <p className="text-muted-foreground leading-none">Based on the daily average for the last month</p>

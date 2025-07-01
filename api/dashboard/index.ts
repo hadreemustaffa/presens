@@ -3,7 +3,13 @@ import { cache } from 'react';
 import { z } from 'zod';
 
 import { createClient } from '@/lib/supabase/server';
-import { AllTimeAttendanceSummary, AttendanceRecord, AttendanceRecordWithUserDetails } from '@/types/interfaces';
+import {
+  AllTimeAttendanceSummary,
+  AttendanceRecord,
+  AttendanceRecordWithUserDetails,
+  DailyDataRecord,
+  UserMetadata,
+} from '@/lib/types/interfaces';
 
 export const getActiveUser = cache(async () => {
   const supabase = await createClient();
@@ -97,15 +103,13 @@ export const getAllTimeSummary = async ({ employee_id }: { employee_id: string }
 };
 
 // because the returning data is in type <json>, we need to type parse it
-const DailyHoursSchema = z.object({
+export const DailyDataSchema = z.object({
   date: z.string(),
   hours_worked: z.number().nullable(),
   lunch_taken_minutes: z.number().nullable(),
 });
 
-const DailyHoursArraySchema = z.array(DailyHoursSchema);
-
-export type DailyHoursRecord = z.infer<typeof DailyHoursSchema>;
+const DailyDataArraySchema = z.array(DailyDataSchema);
 
 export const getDailyHoursRecord = async ({
   p_employee_id,
@@ -115,7 +119,7 @@ export const getDailyHoursRecord = async ({
   p_employee_id: string;
   p_start_date: string;
   p_end_date: string;
-}): Promise<DailyHoursRecord[]> => {
+}): Promise<DailyDataRecord[]> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('get_daily_hours_record', {
@@ -129,11 +133,23 @@ export const getDailyHoursRecord = async ({
     return [];
   }
 
-  const parsed = DailyHoursArraySchema.safeParse(data);
+  const parsed = DailyDataArraySchema.safeParse(data);
   if (!parsed.success) {
     console.error('Invalid data shape:', parsed.error);
     return [];
   }
 
   return parsed.data;
+};
+
+export const getUsers = async () => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.from('users').select('*');
+
+  if (error) {
+    console.error(error);
+  }
+
+  return data as UserMetadata[];
 };
