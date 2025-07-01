@@ -1,6 +1,5 @@
 'use client';
 
-import { User } from '@supabase/supabase-js';
 import { IconBook, IconChartBar, IconDashboard, IconSettings } from '@tabler/icons-react';
 import { Clock } from 'lucide-react';
 import * as React from 'react';
@@ -45,16 +44,7 @@ export const navLinks = {
   ],
 };
 
-interface AppSideBarProps extends React.ComponentProps<typeof Sidebar> {
-  user: User;
-}
-
-export function AppSidebar({ user, ...props }: AppSideBarProps) {
-  const navUser = {
-    name: user.user_metadata.full_name,
-    email: user.user_metadata.email,
-  };
-
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -74,7 +64,7 @@ export function AppSidebar({ user, ...props }: AppSideBarProps) {
         <NavSecondary items={navLinks.secondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={navUser} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

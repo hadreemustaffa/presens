@@ -28,7 +28,7 @@ export const clockInHome = async () => {
     };
   }
 
-  revalidatePath('/dashboard', 'layout');
+  revalidatePath('/dashboard');
   return { success: true };
 };
 
@@ -51,7 +51,7 @@ export const clockInOffice = async () => {
     };
   }
 
-  revalidatePath('/dashboard', 'layout');
+  revalidatePath('/dashboard');
   return { success: true };
 };
 
@@ -86,7 +86,7 @@ export const clockOut = validatedAction(clockOutSchema, async (data) => {
     };
   }
 
-  revalidatePath('/dashboard', 'layout');
+  revalidatePath('/dashboard');
   return {
     success: 'You have clocked out.',
   };
@@ -112,7 +112,7 @@ export const lunchOut = async () => {
     };
   }
 
-  revalidatePath('/dashboard', 'layout');
+  revalidatePath('/dashboard');
   return { success: true };
 };
 
@@ -136,7 +136,7 @@ export const lunchIn = async () => {
     };
   }
 
-  revalidatePath('/dashboard', 'layout');
+  revalidatePath('/dashboard');
   return { success: true };
 };
 
@@ -171,7 +171,7 @@ export const editRemarks = validatedAction(editRemarksSchema, async (data) => {
     };
   }
 
-  revalidatePath('/dashboard/records', 'page');
+  revalidatePath('/dashboard/records');
   return {
     success: 'New remarks have been saved.',
   };
@@ -212,7 +212,7 @@ export const editRecord = validatedAction(editRecordSchema, async (data) => {
     };
   }
 
-  revalidatePath('/dashboard/records', 'page');
+  revalidatePath('/dashboard/records');
   return {
     success: 'Record has been edited.',
   };
@@ -224,20 +224,24 @@ const deleteRecordSchema = z.object({
 
 export const deleteRecord = validatedAction(deleteRecordSchema, async (data) => {
   const supabase = await createClient();
-
   const { id } = data;
 
-  const { error } = await supabase.from('attendance_records').delete().eq('id', id);
+  const { error, count } = await supabase.from('attendance_records').delete({ count: 'exact' }).eq('id', id);
 
   if (error) {
     console.log(error);
-
     return {
       error: 'Failed to delete record. Please try again.',
     };
   }
 
-  revalidatePath('/dashboard/records', 'page');
+  if (count === 0) {
+    return {
+      error: 'You do not have permission to delete this record, or it does not exist.',
+    };
+  }
+
+  revalidatePath('/dashboard/records');
 });
 
 const deleteMultipleRecordsSchema = z.object({
@@ -252,15 +256,20 @@ export const deleteMultipleRecords = validatedAction(deleteMultipleRecordsSchema
 
   const { ids } = data;
 
-  const { error } = await supabase.from('attendance_records').delete().in('id', ids);
+  const { error, count } = await supabase.from('attendance_records').delete({ count: 'exact' }).in('id', ids);
 
   if (error) {
     console.log(error);
-
     return {
       error: 'Failed to delete selected records. Please try again.',
     };
   }
 
-  revalidatePath('/dashboard/records', 'page');
+  if (count === 0) {
+    return {
+      error: 'You do not have permission to delete these records, or they do not exist.',
+    };
+  }
+
+  revalidatePath('/dashboard/records');
 });

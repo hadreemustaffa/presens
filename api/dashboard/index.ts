@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 import { z } from 'zod';
 
 import { createClient } from '@/lib/supabase/server';
 import { AllTimeAttendanceSummary, AttendanceRecord, AttendanceRecordWithUserDetails } from '@/types/interfaces';
 
-export async function getActiveUser() {
+export const getActiveUser = cache(async () => {
   const supabase = await createClient();
 
   const {
@@ -21,7 +22,7 @@ export async function getActiveUser() {
     user,
     isAdmin,
   };
-}
+});
 
 export async function getAttendanceRecord({
   employee_id,
