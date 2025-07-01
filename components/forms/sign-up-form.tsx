@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ActionState } from '@/lib/middleware';
+import { Departments } from '@/lib/types/enums';
 import { cn } from '@/lib/utils';
-import { Departments } from '@/types/enums';
 
 export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(signup, { error: '' });

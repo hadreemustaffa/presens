@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
+import { CountdownTimerProps } from '@/lib/types/interfaces';
 import { getRemainingWorkHours } from '@/lib/utils';
-import { CountdownTimerProps } from '@/types/interfaces';
 
 export const useCountdownTimer = ({ startTime, onComplete }: CountdownTimerProps) => {
   const [timeRemaining, setTimeRemaining] = useState(() => getRemainingWorkHours(startTime));

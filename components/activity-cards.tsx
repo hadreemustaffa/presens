@@ -1,8 +1,8 @@
 import { ArrowRightFromLine, ArrowRightToLine, Coffee } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AttendanceRecord } from '@/lib/types/interfaces';
 import { formatTimeToday, getTimeOfDayAbbr } from '@/lib/utils';
-import { AttendanceRecord } from '@/types/interfaces';
 
 export function ActivityCards(record: AttendanceRecord) {
   return (

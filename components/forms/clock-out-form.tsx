@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ActionState } from '@/lib/middleware';
-import { Remarks } from '@/types/enums';
-import { AttendanceRecord } from '@/types/interfaces';
+import { Remarks } from '@/lib/types/enums';
+import { AttendanceRecord } from '@/lib/types/interfaces';
 
 export default function ClockOutForm(record: AttendanceRecord) {
   const [remark, setRemark] = useState<Remarks[keyof Remarks]>();

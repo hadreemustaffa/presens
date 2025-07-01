@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ActionState } from '@/lib/middleware';
-import { AttendanceRecord } from '@/types/interfaces';
+import { AttendanceRecord } from '@/lib/types/interfaces';
 
 export default function QuickActions(record: AttendanceRecord) {
   const [open, setOpen] = useState(false);

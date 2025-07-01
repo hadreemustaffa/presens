@@ -1,5 +1,5 @@
 import { useCountdownTimer } from '@/hooks/use-countdown-timer';
-import { CountdownTimerProps } from '@/types/interfaces';
+import { CountdownTimerProps } from '@/lib/types/interfaces';
 
 export const CountdownTimer = ({ startTime, onComplete }: CountdownTimerProps) => {
   const { hours, minutes, seconds } = useCountdownTimer({ startTime, onComplete });

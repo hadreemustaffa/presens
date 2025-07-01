@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
-import { Departments } from '@/types/enums';
+import { Departments } from '@/lib/types/enums';
 
 const loginSchema = z.object({
   email: z.string().email().min(3).max(255),

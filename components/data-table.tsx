@@ -61,9 +61,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ActionState } from '@/lib/middleware';
+import { Remarks, WorkMode } from '@/lib/types/enums';
+import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/lib/types/interfaces';
 import { capitalizeFirstLetter } from '@/lib/utils';
-import { Remarks, WorkMode } from '@/types/enums';
-import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/types/interfaces';
 
 export interface DataTableProps {
   isAdmin: boolean;

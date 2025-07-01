@@ -2,7 +2,7 @@ import React from 'react';
 
 import { getActiveUser, getAllAttendanceRecords, getAllEmployeesAttendanceRecords } from '@/api/dashboard';
 import { DataTable } from '@/components/data-table';
-import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/types/interfaces';
+import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/lib/types/interfaces';
 
 export default async function RecordsPage() {
   const { user, isAdmin } = await getActiveUser();

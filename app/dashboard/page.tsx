@@ -5,7 +5,7 @@ import { ActivityCards } from '@/components/activity-cards';
 import AddAttendanceRecordForm from '@/components/forms/add-attendance-record-form';
 import QuickActions from '@/components/quick-actions';
 import StatusCard from '@/components/status-card';
-import { UserMetadata } from '@/types/interfaces';
+import { UserMetadata } from '@/lib/types/interfaces';
 
 export default async function DashboardPage() {
   const { user } = await getActiveUser();

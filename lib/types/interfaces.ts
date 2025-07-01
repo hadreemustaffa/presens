@@ -1,4 +1,7 @@
-import { Departments, Remarks, WorkMode } from '@/types/enums';
+import { z } from 'zod';
+
+import { DailyDataSchema } from '@/api/dashboard';
+import { Departments, Remarks, WorkMode } from '@/lib/types/enums';
 
 export interface AttendanceRecord {
   id: number;
@@ -44,6 +47,8 @@ export interface AllTimeAttendanceSummary {
     name: string;
   }[];
 }
+
+export type DailyDataRecord = z.infer<typeof DailyDataSchema>;
 
 export interface UserMetadata {
   email: string;

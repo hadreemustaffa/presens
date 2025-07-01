@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { getActiveUser } from '@/api/dashboard';
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
-import { Remarks, WorkMode } from '@/types/enums';
+import { Remarks, WorkMode } from '@/lib/types/enums';
 
 export const clockInHome = async () => {
   const supabase = await createClient();
