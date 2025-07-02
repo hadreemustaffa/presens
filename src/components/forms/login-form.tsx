@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-import { login } from '@/actions/auth/actions';
 import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { login } from '@/features/auth/actions/actions';
 import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 

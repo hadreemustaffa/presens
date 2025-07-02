@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 
-import { signup } from '@/actions/auth/actions';
 import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { signup } from '@/features/auth/actions/actions';
+import { Departments } from '@/features/model/enums';
 import { ActionState } from '@/lib/middleware';
-import { Departments } from '@/lib/types/enums';
 import { cn } from '@/lib/utils';
 
 export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>) {

@@ -4,8 +4,8 @@ import { Label, Pie, PieChart } from 'recharts';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { evaluateWorkModePolicyCompliance } from '@/lib/dashboard/utils';
-import { AllTimeAttendanceSummary } from '@/lib/types/interfaces';
+import { evaluateWorkModePolicyCompliance } from '@/features/attendance/summaries/lib/utils';
+import { AllTimeAttendanceSummary } from '@/features/attendance/summaries/model/interfaces';
 
 const chartConfig = {
   work_mode: {

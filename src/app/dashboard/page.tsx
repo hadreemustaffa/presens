@@ -1,18 +1,17 @@
 import dayjs from 'dayjs';
 
-import { getActiveUser, getAttendanceRecord } from '@/api/dashboard';
+import { getActiveUser } from '@/api';
 import { ActivityCards } from '@/components/activity-cards';
 import AddAttendanceRecordForm from '@/components/forms/add-attendance-record-form';
 import QuickActions from '@/components/quick-actions';
 import StatusCard from '@/components/status-card';
-import { UserMetadata } from '@/lib/types/interfaces';
+import { getAttendanceRecord } from '@/features/attendance/records/api/attendance-records.api';
 
 export default async function DashboardPage() {
   const { user } = await getActiveUser();
-  const userMetadata = user.user_metadata as UserMetadata;
 
   const record = await getAttendanceRecord({
-    employee_id: userMetadata.employee_id,
+    employee_id: user.user_metadata.employee_id,
     work_date: dayjs().format('YYYY-MM-DD'),
   });
 

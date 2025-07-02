@@ -5,7 +5,7 @@ import duration from 'dayjs/plugin/duration';
 import { useEffect, useState } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AttendanceRecord } from '@/lib/types/interfaces';
+import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
 import { convertTimeTodayToDayjs, getRemainingWorkHours, getTimeOfDayAbbr } from '@/lib/utils';
 
 dayjs.extend(duration);

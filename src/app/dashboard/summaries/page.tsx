@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
 
-import { getActiveUser, getAllTimeSummary, getDailyDataRecords, getUsers } from '@/api/dashboard';
-import Summary from '@/app/dashboard/summaries/components/all-time/summary';
+import { getActiveUser } from '@/api';
+import { getAllTimeSummary, getDailyDataRecords } from '@/features/attendance/summaries/api/attendance-summaries.api';
+import Summary from '@/features/attendance/summaries/components/all-time/summary';
+import { getUsers } from '@/features/users/api/users.api';
 import { DEFAULT_CHART_TIMEFRAME, MIN_DAYS_FOR_SUMMARIES } from '@/lib/constants';
 
 type SearchParams = Promise<{ employee_id?: string; timeframe?: string }>;

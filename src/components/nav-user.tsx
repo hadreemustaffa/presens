@@ -3,7 +3,6 @@
 import { IconCreditCard, IconDotsVertical, IconLogout, IconNotification, IconUserCircle } from '@tabler/icons-react';
 import { useActionState } from 'react';
 
-import { logout } from '@/actions/auth/actions';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -15,7 +14,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
-import { useUser } from '@/hooks/useUser';
+import { logout } from '@/features/auth/actions/actions';
+import { useUser } from '@/features/users/hooks/use-user';
 import { ActionState } from '@/lib/middleware';
 
 export function NavUser() {

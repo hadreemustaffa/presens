@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { UserMetadata } from '@/lib/types/interfaces';
+import { UserMetadata } from '@/features/users/model/interfaces';
 
 export default function UserSelect({ users, activeUser }: { users: UserMetadata[]; activeUser: UserMetadata }) {
   const router = useRouter();

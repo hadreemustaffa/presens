@@ -1,5 +1,5 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AllTimeAttendanceSummary } from '@/lib/types/interfaces';
+import { AllTimeAttendanceSummary } from '@/features/attendance/summaries/model/interfaces';
 
 export default function PreferredHomeDaysCard({
   preferred_home_days,
