@@ -2,12 +2,16 @@
 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { Bar, CartesianGrid, BarChart, XAxis } from 'recharts';
 
+import TimeframeSelect from '@/app/dashboard/summaries/components/timeframe-select';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Timeframe } from '@/lib/types/enums';
 import { DailyDataRecord } from '@/lib/types/interfaces';
+import { formatNumber } from '@/lib/utils';
 
 dayjs.extend(duration);
 
@@ -30,6 +34,9 @@ const chartConfig = {
 export default function DailyDataChart({ record }: { record: DailyDataRecord[] }) {
   const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>('hours_worked');
 
+  const searchParams = useSearchParams();
+  const selectedTimeframe = Number(searchParams.get('timeframe')) || 30;
+
   const chartData = useMemo(
     () =>
       record.map((record) => ({
@@ -48,17 +55,27 @@ export default function DailyDataChart({ record }: { record: DailyDataRecord[] }
     [chartData],
   );
 
-  const formatNumber = (value: number) => {
-    return Intl.NumberFormat('en', { notation: 'compact' }).format(value);
-  };
+  let timeframeText: string;
+  if (selectedTimeframe === Timeframe['30 days']) {
+    timeframeText = 'month';
+  } else if (selectedTimeframe === Timeframe['90 days']) {
+    timeframeText = '3 months';
+  } else if (selectedTimeframe === Timeframe['180 days']) {
+    timeframeText = '6 months';
+  } else if (selectedTimeframe === Timeframe['1 year']) {
+    timeframeText = 'year';
+  } else {
+    timeframeText = 'week';
+  }
 
   return (
     <Card className="col-span-1 py-0 @[840px]/main:col-span-2">
       <CardHeader className="flex flex-col items-stretch border-b !p-0 @lg/main:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 @lg/main:!py-0">
           <CardDescription>Daily Trends</CardDescription>
-          <CardTitle>Showing past month data</CardTitle>
+          <CardTitle>Showing past {timeframeText} data</CardTitle>
         </div>
+
         <div className="flex">
           {['hours_worked', 'lunch_taken_minutes'].map((key) => {
             const chart = key as keyof typeof chartConfig;
@@ -80,7 +97,7 @@ export default function DailyDataChart({ record }: { record: DailyDataRecord[] }
           })}
         </div>
       </CardHeader>
-      <CardContent className="h-full place-content-center px-2 sm:p-6 sm:pb-0">
+      <CardContent className="relative h-full place-content-center px-2 sm:p-6 sm:pb-0">
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
           <BarChart
             accessibilityLayer
@@ -123,16 +140,19 @@ export default function DailyDataChart({ record }: { record: DailyDataRecord[] }
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 px-6 pb-6 text-sm">
-        <p className="flex gap-2 leading-none font-medium">
-          Averaging around{' '}
-          {activeChart === 'hours_worked' ? (
-            <>{(total.hours_worked / record.length).toFixed(1)} hours daily</>
-          ) : (
-            <>{Math.round(total.lunch_taken_minutes / record.length)} minutes daily</>
-          )}
-        </p>
-        <p className="text-muted-foreground leading-none">Based on the daily average for the last month</p>
+      <CardFooter className="flex items-center justify-between gap-2 px-6 pb-6 text-sm">
+        <div className="flex flex-col gap-2">
+          <p className="flex gap-2 leading-none font-medium">
+            Averaging around{' '}
+            {activeChart === 'hours_worked' ? (
+              <>{(total.hours_worked / record.length).toFixed(1)} hours daily</>
+            ) : (
+              <>{Math.round(total.lunch_taken_minutes / record.length)} minutes daily</>
+            )}
+          </p>
+          <p className="text-muted-foreground leading-none">Based on the daily average for the past {timeframeText}</p>
+        </div>
+        <TimeframeSelect />
       </CardFooter>
     </Card>
   );

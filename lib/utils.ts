@@ -100,3 +100,7 @@ export function getRemainingWorkHours(workStart: string, time?: string) {
 export function capitalizeFirstLetter(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function formatNumber(value: number) {
+  return Intl.NumberFormat('en', { notation: 'compact' }).format(value);
+}

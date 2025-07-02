@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
 
-import { getActiveUser, getAllTimeSummary, getDailyHoursRecord, getUsers } from '@/api/dashboard';
+import { getActiveUser, getAllTimeSummary, getDailyDataRecords, getUsers } from '@/api/dashboard';
 import Summary from '@/app/dashboard/summaries/components/all-time/summary';
-import { MIN_DAYS_FOR_SUMMARIES } from '@/lib/constants';
+import { DEFAULT_CHART_TIMEFRAME, MIN_DAYS_FOR_SUMMARIES } from '@/lib/constants';
 
-type SearchParams = Promise<{ employee_id?: string }>;
+type SearchParams = Promise<{ employee_id?: string; timeframe?: string }>;
 
 export default async function Page(props: { searchParams: SearchParams }) {
   const { user, isAdmin } = await getActiveUser();
@@ -14,13 +14,19 @@ export default async function Page(props: { searchParams: SearchParams }) {
   const selectedUserId =
     isAdmin && searchParams.employee_id ? searchParams.employee_id : user.user_metadata.employee_id;
 
+  const selectedChartTimeframe = searchParams.timeframe ? searchParams.timeframe : DEFAULT_CHART_TIMEFRAME;
+
   const summary = await getAllTimeSummary({ employee_id: selectedUserId });
+
+  const isChartTimeframeMoreThanAWeek = Number(searchParams.timeframe) > 7;
 
   const users = getUsers();
 
-  const dailyDataRecord = getDailyHoursRecord({
+  const dailyDataRecord = getDailyDataRecords({
     p_employee_id: selectedUserId,
-    p_start_date: dayjs().subtract(1, 'month').startOf('month').format('YYYY-MM-DD'),
+    p_start_date: isChartTimeframeMoreThanAWeek
+      ? dayjs().subtract(Number(selectedChartTimeframe), 'days').startOf('month').format('YYYY-MM-DD')
+      : dayjs().subtract(Number(selectedChartTimeframe), 'days').format('YYYY-MM-DD'),
     p_end_date: dayjs().format('YYYY-MM-DD'),
   });
 

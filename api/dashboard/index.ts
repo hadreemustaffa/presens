@@ -111,7 +111,7 @@ export const DailyDataSchema = z.object({
 
 const DailyDataArraySchema = z.array(DailyDataSchema);
 
-export const getDailyHoursRecord = async ({
+export const getDailyDataRecords = async ({
   p_employee_id,
   p_start_date,
   p_end_date,
@@ -122,7 +122,7 @@ export const getDailyHoursRecord = async ({
 }): Promise<DailyDataRecord[]> => {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc('get_daily_hours_record', {
+  const { data, error } = await supabase.rpc('get_daily_data_record', {
     p_employee_id,
     p_start_date,
     p_end_date,

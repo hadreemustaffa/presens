@@ -380,10 +380,10 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
       };
-      get_daily_hours_record: {
+      get_daily_data_record: {
         Args: {
           p_employee_id: string;
-          p_start_date?: string;
+          p_start_date: string;
           p_end_date?: string;
         };
         Returns: Json;
