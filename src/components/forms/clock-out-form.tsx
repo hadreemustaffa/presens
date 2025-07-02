@@ -1,16 +1,16 @@
 import { useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { clockOut } from '@/actions/dashboard/actions';
 import { CountdownTimer } from '@/components/countdown-timer';
 import { Button } from '@/components/ui/button';
 import { DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { clockOut } from '@/features/attendance/records/actions/actions';
+import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
+import { Remarks } from '@/features/model/enums';
 import { ActionState } from '@/lib/middleware';
-import { Remarks } from '@/lib/types/enums';
-import { AttendanceRecord } from '@/lib/types/interfaces';
 
 export default function ClockOutForm(record: AttendanceRecord) {
   const [remark, setRemark] = useState<Remarks[keyof Remarks]>();

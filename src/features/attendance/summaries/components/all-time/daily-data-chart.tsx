@@ -6,11 +6,11 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { Bar, CartesianGrid, BarChart, XAxis } from 'recharts';
 
-import TimeframeSelect from '@/app/dashboard/summaries/components/timeframe-select';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Timeframe } from '@/lib/types/enums';
-import { DailyDataRecord } from '@/lib/types/interfaces';
+import TimeframeSelect from '@/features/attendance/summaries/components/timeframe-select';
+import { Timeframe } from '@/features/attendance/summaries/model/enums';
+import { DailyDataRecord } from '@/features/attendance/summaries/model/types';
 import { formatNumber } from '@/lib/utils';
 
 dayjs.extend(duration);

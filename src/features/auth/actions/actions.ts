@@ -4,9 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+import { Departments } from '@/features/model/enums';
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
-import { Departments } from '@/lib/types/enums';
 
 const loginSchema = z.object({
   email: z.string().email().min(3).max(255),

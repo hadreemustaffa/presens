@@ -4,13 +4,13 @@ import { ArrowRightFromLine, Coffee } from 'lucide-react';
 import { useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { lunchIn, lunchOut } from '@/actions/dashboard/actions';
 import ClockOutForm from '@/components/forms/clock-out-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { lunchIn, lunchOut } from '@/features/attendance/records/actions/actions';
+import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
 import { ActionState } from '@/lib/middleware';
-import { AttendanceRecord } from '@/lib/types/interfaces';
 
 export default function QuickActions(record: AttendanceRecord) {
   const [open, setOpen] = useState(false);

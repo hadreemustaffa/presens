@@ -2,15 +2,16 @@
 
 import { Suspense } from 'react';
 
-import AttendanceCalendar from './attendance-calendar';
-import DailyDataChart from './daily-data-chart';
-import MetricsCard from './metrics-card';
-import PreferredHomeDaysCard from './preferred-home-days-card';
-import WorkModeChart from './work-mode-chart';
-
-import UserSelect from '@/app/dashboard/summaries/components/user-select';
-import { useUser } from '@/hooks/useUser';
-import { AllTimeAttendanceSummary, DailyDataRecord, UserMetadata } from '@/lib/types/interfaces';
+import AttendanceCalendar from '@/features/attendance/summaries/components/all-time/attendance-calendar';
+import DailyDataChart from '@/features/attendance/summaries/components/all-time/daily-data-chart';
+import MetricsCard from '@/features/attendance/summaries/components/all-time/metrics-card';
+import PreferredHomeDaysCard from '@/features/attendance/summaries/components/all-time/preferred-home-days-card';
+import WorkModeChart from '@/features/attendance/summaries/components/all-time/work-mode-chart';
+import UserSelect from '@/features/attendance/summaries/components/user-select';
+import { AllTimeAttendanceSummary } from '@/features/attendance/summaries/model/interfaces';
+import { DailyDataRecord } from '@/features/attendance/summaries/model/types';
+import { useUser } from '@/features/users/hooks/use-user';
+import { UserMetadata } from '@/features/users/model/interfaces';
 
 export default function Summary({
   summary,

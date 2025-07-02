@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Timeframe } from '@/lib/types/enums';
+import { Timeframe } from '@/features/attendance/summaries/model/enums';
 
 export default function TimeframeSelect() {
   const router = useRouter();

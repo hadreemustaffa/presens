@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { AllTimeAttendanceSummary } from '@/features/attendance/summaries/model/interfaces';
 import {
   LUNCH_MAX_IDEAL_MINUTES,
   LUNCH_MIN_IDEAL_MINUTES,
@@ -13,7 +14,6 @@ import {
   ATTENDANCE_RATE_MIN_THRESHOLD_PERCENT,
   ATTENDANCE_RATE_MAX_THRESHOLD_PERCENT,
 } from '@/lib/constants';
-import { AllTimeAttendanceSummary } from '@/lib/types/interfaces';
 
 dayjs.extend(duration);
 

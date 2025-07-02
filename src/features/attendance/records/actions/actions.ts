@@ -4,10 +4,10 @@ import dayjs from 'dayjs';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-import { getActiveUser } from '@/api/dashboard';
+import { getActiveUser } from '@/api';
+import { Remarks, WorkMode } from '@/features/model/enums';
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
-import { Remarks, WorkMode } from '@/lib/types/enums';
 
 export const clockInHome = async () => {
   const supabase = await createClient();

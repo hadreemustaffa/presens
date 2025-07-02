@@ -3,8 +3,8 @@
 import { useActionState, useEffect } from 'react';
 import { toast } from 'sonner';
 
-import { clockInHome, clockInOffice } from '@/actions/dashboard/actions';
 import { Button } from '@/components/ui/button';
+import { clockInHome, clockInOffice } from '@/features/attendance/records/actions/actions';
 import { ActionState } from '@/lib/middleware';
 
 export default function AddAttendanceRecordForm() {

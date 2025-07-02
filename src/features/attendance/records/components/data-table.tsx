@@ -25,7 +25,6 @@ import { ArrowUpDown, ChevronDown, Trash } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 
-import { deleteMultipleRecords, deleteRecord, editRecord, editRemarks } from '@/actions/dashboard/actions';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -59,10 +58,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  deleteMultipleRecords,
+  deleteRecord,
+  editRecord,
+  editRemarks,
+} from '@/features/attendance/records/actions/actions';
+import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/features/attendance/records/model/interfaces';
+import { Remarks, WorkMode } from '@/features/model/enums';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ActionState } from '@/lib/middleware';
-import { Remarks, WorkMode } from '@/lib/types/enums';
-import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/lib/types/interfaces';
 import { capitalizeFirstLetter } from '@/lib/utils';
 
 export interface DataTableProps {
