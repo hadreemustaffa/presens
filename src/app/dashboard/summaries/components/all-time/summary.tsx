@@ -2,15 +2,15 @@
 
 import { Suspense } from 'react';
 
-import UserSelect from '@/app/dashboard/summaries/components/user-select';
-import { useUser } from '@/hooks/useUser';
-import { AllTimeAttendanceSummary, DailyDataRecord, UserMetadata } from '@/lib/types/interfaces';
-
 import AttendanceCalendar from './attendance-calendar';
 import DailyDataChart from './daily-data-chart';
 import MetricsCard from './metrics-card';
 import PreferredHomeDaysCard from './preferred-home-days-card';
 import WorkModeChart from './work-mode-chart';
+
+import UserSelect from '@/app/dashboard/summaries/components/user-select';
+import { useUser } from '@/hooks/useUser';
+import { AllTimeAttendanceSummary, DailyDataRecord, UserMetadata } from '@/lib/types/interfaces';
 
 export default function Summary({
   summary,
