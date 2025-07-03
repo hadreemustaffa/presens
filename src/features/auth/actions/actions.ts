@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
-import { Departments } from '@/features/model/enums';
+import { Departments } from '@/features/shared/model/enums';
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
 

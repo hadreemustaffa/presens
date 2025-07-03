@@ -1,4 +1,4 @@
-import { Departments } from '@/features/model/enums';
+import { Departments } from '@/features/shared/model/enums';
 
 export interface UserMetadata {
   email: string;

@@ -65,7 +65,7 @@ import {
   editRemarks,
 } from '@/features/attendance/records/actions/actions';
 import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/features/attendance/records/model/interfaces';
-import { Remarks, WorkMode } from '@/features/model/enums';
+import { Remarks, WorkMode } from '@/features/shared/model/enums';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ActionState } from '@/lib/middleware';
 import { capitalizeFirstLetter } from '@/lib/utils';

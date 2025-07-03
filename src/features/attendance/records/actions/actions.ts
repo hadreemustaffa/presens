@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { getActiveUser } from '@/api';
-import { Remarks, WorkMode } from '@/features/model/enums';
+import { Remarks, WorkMode } from '@/features/shared/model/enums';
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
 

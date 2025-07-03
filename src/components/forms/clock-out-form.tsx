@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { clockOut } from '@/features/attendance/records/actions/actions';
 import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
-import { Remarks } from '@/features/model/enums';
+import { Remarks } from '@/features/shared/model/enums';
 import { ActionState } from '@/lib/middleware';
 
 export default function ClockOutForm(record: AttendanceRecord) {

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { signup } from '@/features/auth/actions/actions';
-import { Departments } from '@/features/model/enums';
+import { Departments } from '@/features/shared/model/enums';
 import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 
