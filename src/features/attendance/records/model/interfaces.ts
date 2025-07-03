@@ -1,4 +1,4 @@
-import { Departments, Remarks, WorkMode } from '@/features/model/enums';
+import { Departments, Remarks, WorkMode } from '@/features/shared/model/enums';
 
 export interface AttendanceRecord {
   id: number;
