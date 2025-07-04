@@ -1,5 +1,4 @@
 export const FULL_DAY_WORK_HOURS = 8;
-
 export const HALF_DAY_WORK_HOURS = 4;
 
 export const LUNCH_HOURS = 1;
@@ -15,3 +14,11 @@ export const CLOCK_IN_VARIATION_MIN_MINUTES = 15;
 export const MIN_DAYS_FOR_SUMMARIES = 7;
 
 export const DEFAULT_CHART_TIMEFRAME = 30;
+
+export const TIME_FORMAT = 'HH:mm:ss';
+export const DATE_FORMAT = 'YYYY-MM-DD';
+
+// Routes
+export const DASHBOARD_PATH = '/dashboard';
+export const RECORDS_PATH = '/dashboard/records';
+export const SUMMARIES_PATH = '/dashboard/summaries';
