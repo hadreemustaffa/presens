@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { twMerge } from 'tailwind-merge';
 
-import { LUNCH_HOURS, FULL_DAY_WORK_HOURS } from '@/lib/constants';
+import { LUNCH_HOURS, FULL_DAY_WORK_HOURS, TIME_FORMAT, DATE_FORMAT } from '@/lib/constants';
 
 dayjs.extend(isBetween);
 
@@ -24,7 +24,7 @@ export function getTimeOfDay() {
 }
 
 export function getTimeOfDayAbbr(time: string) {
-  const today = dayjs().format('YYYY-MM-DD');
+  const today = dayjs().format(DATE_FORMAT);
 
   const recordedTime = dayjs(`${today} ${time}`);
   const hours = recordedTime.hour();
@@ -54,7 +54,7 @@ export function formatTime(timestamp: string, format: string) {
  * @returns Formatted string.
  */
 export function formatTimeToday(timestamp: string, format?: string) {
-  const today = dayjs().format('YYYY-MM-DD');
+  const today = dayjs().format(DATE_FORMAT);
   return dayjs(`${today} ${timestamp}`).format(`${format}`);
 }
 
@@ -65,7 +65,7 @@ export function formatTimeToday(timestamp: string, format?: string) {
  * @returns A dayjs object of the current day.
  */
 export function convertTimeTodayToDayjs(timestamp: string) {
-  const today = dayjs().format('YYYY-MM-DD');
+  const today = dayjs().format(DATE_FORMAT);
   return dayjs(`${today} ${timestamp}`);
 }
 
@@ -77,7 +77,7 @@ export function convertTimeTodayToDayjs(timestamp: string) {
  */
 export function getRemainingWorkHours(workStart: string, time?: string) {
   if (!time) {
-    time = dayjs().format('HH:mm:ss');
+    time = dayjs().format(TIME_FORMAT);
   }
 
   const startTime = convertTimeTodayToDayjs(workStart);
@@ -104,3 +104,6 @@ export function capitalizeFirstLetter(str: string) {
 export function formatNumber(value: number) {
   return Intl.NumberFormat('en', { notation: 'compact' }).format(value);
 }
+
+export const getCurrentTime = (): string => dayjs().format(TIME_FORMAT);
+export const getCurrentDate = (): string => dayjs().format(DATE_FORMAT);
