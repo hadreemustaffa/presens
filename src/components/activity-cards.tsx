@@ -1,8 +1,9 @@
+import dayjs from 'dayjs';
 import { ArrowRightFromLine, ArrowRightToLine, Coffee } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
-import { formatTimeToday, getTimeOfDayAbbr } from '@/lib/utils';
+import { formatTimeForDisplay } from '@/lib/utils';
 
 export function ActivityCards(record: AttendanceRecord) {
   return (
@@ -45,6 +46,8 @@ export function ActivityCards(record: AttendanceRecord) {
 }
 
 const Activity = ({ title, time, icon }: { title: string; time: string; icon?: React.ReactNode }) => {
+  const timeFormatted = formatTimeForDisplay(time, 'hh:mm A');
+
   return (
     <div className="flex flex-row items-center justify-between gap-4 rounded-md border px-4 py-2">
       <div className="hidden sm:block">{icon}</div>
@@ -52,10 +55,7 @@ const Activity = ({ title, time, icon }: { title: string; time: string; icon?: R
         <span className="sm:hidden">{icon}</span>
         <div className="flex flex-col">
           <p className="text-sm">{title}</p>
-          <p className="text-lg font-semibold">
-            {formatTimeToday(time, 'HH:mm')}
-            <span className="text-muted-foreground ml-1 text-xs font-normal">{getTimeOfDayAbbr(time)}</span>
-          </p>
+          <p className="text-lg font-semibold">{timeFormatted}</p>
         </div>
       </div>
     </div>

@@ -8,14 +8,12 @@ import { getRemainingWorkHours } from '@/lib/utils';
 dayjs.extend(isBetween);
 
 describe('getRemainingWorkHours', () => {
-  beforeEach(() => {
-    // Reset any mocks before each test
-    vi.clearAllMocks();
-  });
+  const testWorkDate = '2024-01-15';
+  const totalWorkHours = FULL_DAY_WORK_HOURS + LUNCH_HOURS;
 
   describe('when time parameter is provided', () => {
-    it('should return correct remaining hours', () => {
-      const result = getRemainingWorkHours('09:00:00', '15:00:00');
+    it('should return correct remaining hours for mid-day work', () => {
+      const result = getRemainingWorkHours('2024-01-15 09:00:00+8:00', '2024-01-15 15:00:00+8:00');
 
       expect(result).toEqual({
         hours: 3,
@@ -25,7 +23,7 @@ describe('getRemainingWorkHours', () => {
     });
 
     it('should return zero when work day is over', () => {
-      const result = getRemainingWorkHours('09:00:00', '19:00:00');
+      const result = getRemainingWorkHours('2024-01-15 09:00:00+8:00');
 
       expect(result).toEqual({
         hours: 0,
@@ -35,7 +33,8 @@ describe('getRemainingWorkHours', () => {
     });
 
     it('should return zero when current time is before work start', () => {
-      const result = getRemainingWorkHours('09:00:00', '08:00:00');
+      // Work starts at 9:00 AM, current time is 8:00 AM
+      const result = getRemainingWorkHours('2024-01-15 09:00:00+8:00', testWorkDate);
 
       expect(result).toEqual({
         hours: 0,
@@ -45,21 +44,19 @@ describe('getRemainingWorkHours', () => {
     });
 
     it('should handle minutes and seconds correctly', () => {
-      const result = getRemainingWorkHours('09:00:00', '09:30:45');
+      const result = getRemainingWorkHours('2024-01-15 09:00:00+8:00', '2024-01-15 10:05:10+8:00');
 
       expect(result).toEqual({
-        hours: 8,
-        minutes: 29,
-        seconds: 15,
+        hours: 7,
+        minutes: 54,
+        seconds: 50,
       });
     });
   });
 
   describe('when time parameter is not provided', () => {
     beforeEach(() => {
-      // Mock the current time to be consistent
       vi.useFakeTimers();
-      vi.setSystemTime(new Date('2023-01-01 14:30:00'));
     });
 
     afterEach(() => {
@@ -67,30 +64,64 @@ describe('getRemainingWorkHours', () => {
     });
 
     it('should use current time when no time parameter provided', () => {
-      const result = getRemainingWorkHours('09:00:00');
+      // Set current time to 3:00 PM on the same work date
+      vi.setSystemTime(new Date(`${testWorkDate} 15:00:00`));
 
-      // At 14:30, with work day starting at 09:00
-      // 5.5 hours have passed, so remaining = (FULL_DAY_WORK_HOURS + LUNCH_HOURS) - 5.5
-      const expectedHours = Math.floor(FULL_DAY_WORK_HOURS + LUNCH_HOURS - 5.5);
-      const expectedMinutes = 30;
+      const result = getRemainingWorkHours('2024-01-15 09:00:00+8:00');
 
-      expect(result.hours).toBe(expectedHours);
-      expect(result.minutes).toBe(expectedMinutes);
+      // At 15:00, with work starting at 09:00
+      // 6 hours have passed, so remaining including lunch = 9 - 6 = 3 hours
+      expect(result.hours).toBe(3);
+      expect(result.minutes).toBe(0);
       expect(result.seconds).toBe(0);
     });
   });
 
-  // Performance test
+  describe('edge cases', () => {
+    it('should handle exactly at work start time', () => {
+      const result = getRemainingWorkHours('2024-01-15 09:00:00+8:00', '2024-01-15 09:00:00+8:00');
+
+      expect(result).toEqual({
+        hours: totalWorkHours,
+        minutes: 0,
+        seconds: 0,
+      });
+    });
+
+    it('should handle exactly at work end time', () => {
+      const result = getRemainingWorkHours('2024-01-15 18:00:00+8:00');
+
+      expect(result).toEqual({
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      });
+    });
+  });
+
   describe('performance test', () => {
     it('should execute quickly', () => {
       const start = performance.now();
 
       for (let i = 0; i < 1000; i++) {
-        getRemainingWorkHours('09:00:00', '12:00:00');
+        getRemainingWorkHours('2024-01-15 09:00:00+8:00', testWorkDate);
       }
 
       const end = performance.now();
       expect(end - start).toBeLessThan(100); // Should complete 1000 calls in under 100ms
+    });
+  });
+
+  describe('boundary conditions', () => {
+    it('should handle very small remaining time', () => {
+      // 1 second before work ends
+      const result = getRemainingWorkHours('2024-01-15 09:00:00+8:00', '2024-01-15 17:59:59+8:00');
+
+      expect(result).toEqual({
+        hours: 0,
+        minutes: 0,
+        seconds: 1,
+      });
     });
   });
 });

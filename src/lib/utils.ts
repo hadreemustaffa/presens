@@ -1,92 +1,53 @@
 import { clsx, type ClassValue } from 'clsx';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import utc from 'dayjs/plugin/utc';
 import { twMerge } from 'tailwind-merge';
 
 import { LUNCH_HOURS, FULL_DAY_WORK_HOURS, TIME_FORMAT, DATE_FORMAT } from '@/lib/constants';
 
 dayjs.extend(isBetween);
+dayjs.extend(utc);
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getTimeOfDay() {
-  const now = dayjs();
-  const hours = now.hour();
-  if (hours >= 0 && hours < 12) {
-    return 'morning';
-  } else if (hours >= 12 && hours < 18) {
-    return 'afternoon';
-  } else {
-    return 'evening';
-  }
+export function convertUtcToLocalTime(time: string) {
+  return dayjs.utc(`${time}`).local();
 }
 
-export function getTimeOfDayAbbr(time: string) {
-  const today = dayjs().format(DATE_FORMAT);
-
-  const recordedTime = dayjs(`${today} ${time}`);
-  const hours = recordedTime.hour();
-  if (hours >= 0 && hours < 12) {
-    return 'AM';
-  } else if (hours >= 12 && hours < 18) {
-    return 'PM';
-  } else {
-    return 'PM';
-  }
+export function convertLocalTimeToUTC(localTime: string, workDate: string) {
+  return dayjs(`${workDate} ${localTime}`).utc();
 }
 
-/**
- * Formats a timestamp string into a human-readable format.
- * @param {string} timestamp - Timestamp string in YYYY-MM-DD HH:mm:ss format.
- * @param {string} format - Format string for dayjs.
- * @returns Formatted string.
- */
-export function formatTime(timestamp: string, format: string) {
-  return dayjs(timestamp).format(`${format}`);
+export function formatTimeForInput(timestamp: string) {
+  if (!timestamp) return '';
+  return convertUtcToLocalTime(timestamp).format('HH:mm');
 }
 
-/**
- * Formats a timestamp string into a human-readable format, assuming the timestamp is in the current day.
- * @param {string} timestamp - Timestamp string in HH:mm:ss format.
- * @param {string} format - Format string for dayjs.
- * @returns Formatted string.
- */
-export function formatTimeToday(timestamp: string, format?: string) {
-  const today = dayjs().format(DATE_FORMAT);
-  return dayjs(`${today} ${timestamp}`).format(`${format}`);
+export function formatTimeForDatabase(timeValue: string, workDate: string) {
+  if (!timeValue) return '';
+  return convertLocalTimeToUTC(timeValue, workDate).format();
 }
 
-/**
- * Converts a timestamp string in the format of HH:mm:ss to a dayjs object
- * of the current day.
- * @param {string} timestamp - Timestamp string in HH:mm:ss format.
- * @returns A dayjs object of the current day.
- */
-export function convertTimeTodayToDayjs(timestamp: string) {
-  const today = dayjs().format(DATE_FORMAT);
-  return dayjs(`${today} ${timestamp}`);
+export function formatTimeForDisplay(timestamp: string, format: string = 'HH:mm A') {
+  if (!timestamp) return '-';
+  return convertUtcToLocalTime(timestamp).format(format);
 }
 
-/**
- * Calculates the remaining work hours, given the start time of the work day.
- * @param {string} workStart - Start of work timestamp string in HH:mm:ss format.
- * @param {string} time - Optional timestamp to start counting down from in HH:mm:ss format, if not provided, the current time will be used.
- * @returns An object with properties `hours`, `minutes`, and `seconds` representing the remaining time.
- */
 export function getRemainingWorkHours(workStart: string, time?: string) {
   if (!time) {
-    time = dayjs().format(TIME_FORMAT);
+    time = dayjs().format('YYYY-MM-DD HH:mm:ssZ');
   }
 
-  const startTime = convertTimeTodayToDayjs(workStart);
+  const startTime = convertUtcToLocalTime(workStart);
   const endTime = startTime.add(FULL_DAY_WORK_HOURS + LUNCH_HOURS, 'hours');
-  const convertedTime = convertTimeTodayToDayjs(time);
+  const currentTime = convertUtcToLocalTime(time);
 
-  const totalSeconds = endTime.diff(convertedTime, 'seconds');
+  const totalSeconds = endTime.diff(currentTime, 'seconds');
 
-  if (totalSeconds <= 0 || !convertedTime.isBetween(startTime, endTime)) {
+  if (totalSeconds <= 0 || !currentTime.isBetween(startTime, endTime, null, '[]')) {
     return { hours: 0, minutes: 0, seconds: 0 };
   }
 

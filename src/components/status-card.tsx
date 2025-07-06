@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
-import { convertTimeTodayToDayjs, getRemainingWorkHours, getTimeOfDayAbbr } from '@/lib/utils';
+import { FULL_DAY_WORK_HOURS, LUNCH_HOURS } from '@/lib/constants';
+import { convertUtcToLocalTime, getRemainingWorkHours } from '@/lib/utils';
 
 dayjs.extend(duration);
 
@@ -45,8 +46,8 @@ export default function StatusCard(record: AttendanceRecord) {
 
   const status = getAttendanceStatus();
   const statusInfo = STATUS_CONFIG[status];
-  const expectedEnd = convertTimeTodayToDayjs(record.clock_in).add(9, 'hours').format('HH:mm');
-  const timeAbbr = getTimeOfDayAbbr(expectedEnd);
+  const expectedEnd = convertUtcToLocalTime(record.clock_in).add(FULL_DAY_WORK_HOURS + LUNCH_HOURS, 'hours');
+  const formattedExpectedEnd = expectedEnd.format('HH:mm A');
 
   return (
     <Card className="@container/card">
@@ -62,10 +63,7 @@ export default function StatusCard(record: AttendanceRecord) {
         <div>
           <p className="mb-1 text-sm">Expected End</p>
           {!record.clock_out ? (
-            <p className="text-lg font-bold">
-              {expectedEnd}
-              <span className="text-muted-foreground ml-1 text-xs font-normal">{timeAbbr}</span>
-            </p>
+            <p className="text-lg font-bold">{formattedExpectedEnd}</p>
           ) : (
             <p className="text-lg font-bold">N/A</p>
           )}

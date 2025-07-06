@@ -1,8 +1,8 @@
 import { useCountdownTimer } from '@/hooks/use-countdown-timer';
 import { CountdownTimerProps } from '@/lib/types/interfaces';
 
-export const CountdownTimer = ({ startTime, onComplete }: CountdownTimerProps) => {
-  const { hours, minutes, seconds } = useCountdownTimer({ startTime, onComplete });
+export const CountdownTimer = ({ startTime, workDate, onComplete }: CountdownTimerProps) => {
+  const { hours, minutes, seconds } = useCountdownTimer({ startTime, workDate, onComplete });
 
   const formatTime = (value: number) => value.toString().padStart(2, '0');
 

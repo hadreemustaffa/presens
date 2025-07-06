@@ -15,7 +15,7 @@ export const MIN_DAYS_FOR_SUMMARIES = 7;
 
 export const DEFAULT_CHART_TIMEFRAME = 30;
 
-export const TIME_FORMAT = 'HH:mm:ss';
+export const TIME_FORMAT = 'YYYY-MM-DD HH:mm:00Z';
 export const DATE_FORMAT = 'YYYY-MM-DD';
 
 // Routes
