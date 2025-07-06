@@ -15,8 +15,11 @@ export const MIN_DAYS_FOR_SUMMARIES = 7;
 
 export const DEFAULT_CHART_TIMEFRAME = 30;
 
-export const TIME_FORMAT = 'HH:mm:ss';
+export const TIME_FORMAT = 'YYYY-MM-DD HH:mm:00Z';
 export const DATE_FORMAT = 'YYYY-MM-DD';
+
+// Time Zones
+export const TZ_KUALA_LUMPUR = 'Asia/Kuala_Lumpur';
 
 // Routes
 export const DASHBOARD_PATH = '/dashboard';

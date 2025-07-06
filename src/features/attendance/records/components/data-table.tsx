@@ -21,6 +21,8 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { ArrowUpDown, ChevronDown, Trash } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
@@ -68,7 +70,9 @@ import { AttendanceRecord, AttendanceRecordWithUserDetails } from '@/features/at
 import { Remarks, WorkMode } from '@/features/shared/model/enums';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ActionState } from '@/lib/middleware';
-import { capitalizeFirstLetter } from '@/lib/utils';
+import { capitalizeFirstLetter, formatTimeForDatabase, formatTimeForDisplay } from '@/lib/utils';
+
+dayjs.extend(utc);
 
 export interface DataTableProps {
   isAdmin: boolean;
@@ -155,25 +159,25 @@ const getColumns = (isAdmin: boolean): ColumnDef<AttendanceRecord | AttendanceRe
   {
     accessorKey: 'clock_in',
     header: 'Clock In',
-    cell: ({ row }) => <div>{row.getValue('clock_in')}</div>,
+    cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('clock_in'))}</div>,
     enableColumnFilter: false,
   },
   {
     accessorKey: 'clock_out',
     header: 'Clock Out',
-    cell: ({ row }) => <div>{row.getValue('clock_out')}</div>,
+    cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('clock_out'))}</div>,
     enableColumnFilter: false,
   },
   {
     accessorKey: 'lunch_out',
     header: 'Lunch Out',
-    cell: ({ row }) => <div>{row.getValue('lunch_out')}</div>,
+    cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('lunch_out'))}</div>,
     enableColumnFilter: false,
   },
   {
     accessorKey: 'lunch_in',
     header: 'Lunch In',
-    cell: ({ row }) => <div>{row.getValue('lunch_in')}</div>,
+    cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('lunch_in'))}</div>,
     enableColumnFilter: false,
   },
   {
@@ -446,6 +450,61 @@ function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDet
     success: '',
   });
 
+  const clockIn = formatTimeForDisplay(row.getValue('clock_in'), 'HH:mm:ss');
+  const clockOut = formatTimeForDisplay(row.getValue('clock_out'), 'HH:mm:ss');
+  const lunchIn = formatTimeForDisplay(row.getValue('lunch_in'), 'HH:mm:ss');
+  const lunchOut = formatTimeForDisplay(row.getValue('lunch_out'), 'HH:mm:ss');
+
+  const originalValues = React.useMemo(
+    () => ({
+      clock_in: formatTimeForDisplay(row.getValue('clock_in'), 'HH:mm:ss'),
+      clock_out: formatTimeForDisplay(row.getValue('clock_out'), 'HH:mm:ss'),
+      lunch_in: formatTimeForDisplay(row.getValue('lunch_in'), 'HH:mm:ss'),
+      lunch_out: formatTimeForDisplay(row.getValue('lunch_out'), 'HH:mm:ss'),
+      work_mode: row.getValue('work_mode') as string,
+    }),
+    [row],
+  );
+
+  const hasChanges = (formData: FormData) => {
+    const currentValues = {
+      clock_in: formData.get('clock_in') as string,
+      clock_out: formData.get('clock_out') as string,
+      lunch_in: formData.get('lunch_in') as string,
+      lunch_out: formData.get('lunch_out') as string,
+      work_mode: formData.get('work_mode') as string,
+    };
+
+    return Object.keys(originalValues).some((key) => {
+      const originalValue = originalValues[key as keyof typeof originalValues];
+      const currentValue = currentValues[key as keyof typeof currentValues];
+      const hasChanged = originalValue !== currentValue;
+
+      return hasChanged;
+    });
+  };
+
+  const handleAction = async (formData: FormData) => {
+    if (!hasChanges(formData)) {
+      setOpenDrawer(false);
+      return;
+    }
+
+    const timeFields = ['clock_in', 'clock_out', 'lunch_in', 'lunch_out'];
+
+    timeFields.forEach((field) => {
+      const timeValue = formData.get(field) as string;
+      const workDate = formData.get('work_date') as string;
+
+      if (timeValue) {
+        const utcDateTime = formatTimeForDatabase(timeValue, workDate);
+        formData.set(field, utcDateTime);
+      }
+    });
+
+    await action(formData);
+  };
+
   React.useEffect(() => {
     if (state?.error) {
       toast.error('An error has occurred', {
@@ -463,7 +522,7 @@ function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDet
       });
       setOpenDrawer(false);
     }
-  }, [state?.success]);
+  }, [state]);
 
   return (
     <Drawer direction={isMobile ? 'bottom' : 'right'} open={openDrawer} onOpenChange={setOpenDrawer}>
@@ -477,7 +536,7 @@ function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDet
           <DrawerTitle>Edit employee record</DrawerTitle>
           <DrawerDescription>Review the information, make edits, and save.</DrawerDescription>
         </DrawerHeader>
-        <form id="edit-record-form" className="flex flex-col gap-4 p-4" action={action}>
+        <form id="edit-record-form" className="flex flex-col gap-4 p-4" action={handleAction}>
           <input type="hidden" name="work_date" value={row.original.work_date} />
           <input type="hidden" name="employee_id" value={row.original.employee_id} />
 
@@ -489,7 +548,7 @@ function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDet
                 name="clock_in"
                 type="time"
                 className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                defaultValue={row.getValue('clock_in')}
+                defaultValue={clockIn}
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -499,7 +558,7 @@ function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDet
                 name="lunch_out"
                 type="time"
                 className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                defaultValue={row.getValue('lunch_out')}
+                defaultValue={lunchOut}
               />
             </div>
           </div>
@@ -511,7 +570,7 @@ function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDet
                 name="lunch_in"
                 type="time"
                 className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                defaultValue={row.getValue('lunch_in')}
+                defaultValue={lunchIn}
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -521,7 +580,7 @@ function TableCellViewer(row: Row<AttendanceRecord | AttendanceRecordWithUserDet
                 name="clock_out"
                 type="time"
                 className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                defaultValue={row.getValue('clock_out')}
+                defaultValue={clockOut}
               />
             </div>
           </div>

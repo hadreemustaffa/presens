@@ -22,10 +22,10 @@ export const editRemarksSchema = z.object({
 
 export const editRecordSchema = z.object({
   employee_id: z.string(),
-  clock_in: z.string().time(),
-  lunch_out: z.string().time(),
-  lunch_in: z.string().time(),
-  clock_out: z.string().time(),
+  clock_in: z.string().datetime(),
+  lunch_out: z.string().datetime(),
+  lunch_in: z.string().datetime(),
+  clock_out: z.string().datetime(),
   work_date: z.string(),
   work_mode: z.nativeEnum(WorkMode),
 });

@@ -82,9 +82,9 @@ describe('Attendance Actions', () => {
 
     // Mock dayjs to return consistent values
     vi.spyOn(dayjs.prototype, 'format').mockImplementation((format) => {
-      if (format === 'HH:mm:ss') return '09:00:00';
+      if (format === 'YYYY-MM-DD HH:mm:ssZ') return '2024-01-15T09:00:00+8:00';
       if (format === 'YYYY-MM-DD') return '2024-01-15';
-      return '2024-01-15';
+      return '2024-01-15T09:00:00+8:00';
     });
   });
 
@@ -99,7 +99,7 @@ describe('Attendance Actions', () => {
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('attendance_records');
       expect(mockAttendanceTable.insert).toHaveBeenCalledWith({
         employee_id: 'EMP001',
-        clock_in: '09:00:00',
+        clock_in: '2024-01-15T09:00:00+8:00',
         work_mode: 'home',
         work_date: '2024-01-15',
       });
@@ -113,7 +113,7 @@ describe('Attendance Actions', () => {
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('attendance_records');
       expect(mockAttendanceTable.insert).toHaveBeenCalledWith({
         employee_id: 'EMP001',
-        clock_in: '09:00:00',
+        clock_in: '2024-01-15T09:00:00+8:00',
         work_mode: 'office',
         work_date: '2024-01-15',
       });
@@ -144,7 +144,7 @@ describe('Attendance Actions', () => {
 
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('attendance_records');
       expect(mockAttendanceTable.update).toHaveBeenCalledWith({
-        clock_out: '09:00:00',
+        clock_out: '2024-01-15T09:00:00+8:00',
         remarks: Remarks.EmergencyLeave,
       });
       expect(mockAttendanceTable.eq).toHaveBeenCalledWith('employee_id', 'EMP001');
@@ -162,7 +162,7 @@ describe('Attendance Actions', () => {
       const result = await clockOut(mockData, {} as FormData);
 
       expect(mockAttendanceTable.update).toHaveBeenCalledWith({
-        clock_out: '09:00:00',
+        clock_out: '2024-01-15T09:00:00+8:00',
         remarks: 'Personal appointment',
       });
       expect(result).toEqual({ success: 'You have clocked out.' });
@@ -187,7 +187,7 @@ describe('Attendance Actions', () => {
 
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('attendance_records');
       expect(mockAttendanceTable.update).toHaveBeenCalledWith({
-        lunch_out: '09:00:00',
+        lunch_out: '2024-01-15T09:00:00+8:00',
       });
       expect(mockAttendanceTable.eq).toHaveBeenCalledWith('employee_id', 'EMP001');
       expect(mockAttendanceTable.eq).toHaveBeenCalledWith('work_date', '2024-01-15');
@@ -200,7 +200,7 @@ describe('Attendance Actions', () => {
 
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('attendance_records');
       expect(mockAttendanceTable.update).toHaveBeenCalledWith({
-        lunch_in: '09:00:00',
+        lunch_in: '2024-01-15T09:00:00+8:00',
       });
       expect(mockAttendanceTable.eq).toHaveBeenCalledWith('employee_id', 'EMP001');
       expect(mockAttendanceTable.eq).toHaveBeenCalledWith('work_date', '2024-01-15');
@@ -275,10 +275,10 @@ describe('Attendance Actions', () => {
     it('should successfully edit a complete record', async () => {
       const mockData = {
         employee_id: 'EMP001',
-        clock_in: '09:00:00',
-        lunch_out: '12:00:00',
-        lunch_in: '13:00:00',
-        clock_out: '18:00:00',
+        clock_in: '2024-01-15T09:00:00+8:00',
+        lunch_out: '2024-01-15T12:00:00+8:00',
+        lunch_in: '2024-01-15T13:00:00+8:00',
+        clock_out: '2024-01-15T18:00:00+8:00',
         work_date: '2024-01-15',
         work_mode: WorkMode.Office,
       };
@@ -287,10 +287,10 @@ describe('Attendance Actions', () => {
 
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('attendance_records');
       expect(mockAttendanceTable.update).toHaveBeenCalledWith({
-        clock_in: '09:00:00',
-        lunch_out: '12:00:00',
-        lunch_in: '13:00:00',
-        clock_out: '18:00:00',
+        clock_in: '2024-01-15T09:00:00+8:00',
+        lunch_out: '2024-01-15T12:00:00+8:00',
+        lunch_in: '2024-01-15T13:00:00+8:00',
+        clock_out: '2024-01-15T18:00:00+8:00',
         work_mode: WorkMode.Office,
       });
       expect(mockAttendanceTable.eq).toHaveBeenCalledWith('employee_id', 'EMP001');
@@ -306,10 +306,10 @@ describe('Attendance Actions', () => {
 
       const mockData = {
         employee_id: 'EMP001',
-        clock_in: '09:00:00',
-        lunch_out: '12:00:00',
-        lunch_in: '13:00:00',
-        clock_out: '18:00:00',
+        clock_in: '2024-01-15T09:00:00+8:00',
+        lunch_out: '2024-01-15T12:00:00+8:00',
+        lunch_in: '2024-01-15T13:00:00+8:00',
+        clock_out: '2024-01-15T18:00:00+8:00',
         work_date: '2024-01-15',
         work_mode: WorkMode.Office,
       };
@@ -414,7 +414,7 @@ describe('Attendance Actions', () => {
       await clockOut(mockData, {} as FormData);
 
       expect(mockAttendanceTable.update).toHaveBeenCalledWith({
-        clock_out: '09:00:00',
+        clock_out: '2024-01-15T09:00:00+8:00',
         remarks: null,
       });
     });
@@ -428,7 +428,7 @@ describe('Attendance Actions', () => {
       await clockOut(mockData, {} as FormData);
 
       expect(mockAttendanceTable.update).toHaveBeenCalledWith({
-        clock_out: '09:00:00',
+        clock_out: '2024-01-15T09:00:00+8:00',
         remarks: 'Custom message takes priority',
       });
     });
