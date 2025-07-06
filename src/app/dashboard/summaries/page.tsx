@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { getActiveUser } from '@/api';
 import { getAllTimeSummary, getDailyDataRecords } from '@/features/attendance/summaries/api/attendance-summaries.api';
 import Summary from '@/features/attendance/summaries/components/all-time/summary';
+import UserSelect from '@/features/attendance/summaries/components/user-select';
 import { getUsers } from '@/features/users/api/users.api';
 import { DEFAULT_CHART_TIMEFRAME, MIN_DAYS_FOR_SUMMARIES } from '@/lib/constants';
 
@@ -22,7 +23,7 @@ export default async function Page(props: { searchParams: SearchParams }) {
 
   const isChartTimeframeMoreThanAWeek = Number(searchParams.timeframe) > 7;
 
-  const users = getUsers();
+  const users = await getUsers();
 
   const dailyDataRecord = getDailyDataRecords({
     p_employee_id: selectedUserId,
@@ -37,8 +38,21 @@ export default async function Page(props: { searchParams: SearchParams }) {
   if (!summary) {
     return (
       <div className="flex h-full flex-col gap-4 px-4">
-        <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
-        <div className="flex h-full flex-col items-center justify-center gap-4 rounded-md border">
+        <div className="flex flex-row items-center justify-between">
+          <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
+          {user?.user_metadata.user_role === 'admin' && (
+            <UserSelect
+              users={users}
+              activeUser={{
+                email: user.user_metadata.email,
+                full_name: user.user_metadata.full_name,
+                department: user.user_metadata.department,
+                employee_id: user.user_metadata.employee_id,
+              }}
+            />
+          )}
+        </div>
+        <div className="flex h-full flex-col items-center justify-center gap-4 rounded-md border text-center">
           <div>No data available</div>
         </div>
       </div>
@@ -48,14 +62,38 @@ export default async function Page(props: { searchParams: SearchParams }) {
   if (summary.total_days < MIN_DAYS_FOR_SUMMARIES) {
     return (
       <div className="flex h-full flex-col gap-4 px-4">
-        <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
-        <div className="flex h-full flex-col items-center justify-center gap-2 rounded-md border">
-          <p>
-            You&apos;ll see summaries here once you have {MIN_DAYS_FOR_SUMMARIES - summary.total_days} more days of
-            attendance.
-          </p>
-          <p>This ensures your insights are relevant and informative.</p>
-        </div>
+        {user?.user_metadata.user_role === 'admin' ? (
+          <>
+            <div className="flex flex-row items-center justify-between">
+              <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
+              <UserSelect
+                users={users}
+                activeUser={{
+                  email: user.user_metadata.email,
+                  full_name: user.user_metadata.full_name,
+                  department: user.user_metadata.department,
+                  employee_id: user.user_metadata.employee_id,
+                }}
+              />
+            </div>
+            <div className="flex h-full flex-col items-center justify-center gap-2 rounded-md border p-4 text-center">
+              <p>
+                This employee&apos;s summaries will be available after {MIN_DAYS_FOR_SUMMARIES - summary.total_days}{' '}
+                more days of attendance.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
+            <div className="flex h-full flex-col items-center justify-center gap-2 rounded-md border p-4 text-center">
+              <p>
+                You&apos;ll see summaries here once you have {MIN_DAYS_FOR_SUMMARIES - summary.total_days} more days of
+                attendance.
+              </p>
+            </div>
+          </>
+        )}
       </div>
     );
   }

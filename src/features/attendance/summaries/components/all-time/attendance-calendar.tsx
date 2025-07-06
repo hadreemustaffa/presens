@@ -59,7 +59,6 @@ export default function AttendanceCalendar({
   const currentYear = currentDate.year();
   const today = dayjs();
 
-  // Get days in current month
   const daysInMonth = currentDate.daysInMonth();
   const firstDayOfMonth = currentDate.startOf('month').day();
 
@@ -75,44 +74,24 @@ export default function AttendanceCalendar({
     return public_holidays_dates.find((holiday) => holiday.date === dateStr) || null;
   };
 
-  const getDayType = (day: number, month: number, year: number): DayType => {
+  const getDayType = (day: number, month: number, year: number): DayType | undefined => {
     const date = dayjs().year(year).month(month).date(day);
     const dateStr = date.format('YYYY-MM-DD');
     const dayOfWeek = date.day();
 
-    // Check if it's today
-    if (date.isSame(today, 'day')) {
-      return 'today';
-    }
-    // Check if it's a public holiday
-    if (public_holidays_dates.some((holiday) => holiday.date === dateStr)) {
+    if (date.isSame(today, 'day')) return 'today';
+    if (Array.isArray(public_holidays_dates) && public_holidays_dates.some((holiday) => holiday.date === dateStr)) {
       return 'holiday';
     }
-    // Check if it's a weekend
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      return 'weekend';
-    }
-    // Check if it's an incomplete record
-    if (incomplete_records_dates.includes(dateStr)) {
-      return 'incomplete';
-    }
-    // Check if it's a leave date
-    if (leave_dates.includes(dateStr)) {
-      return 'leave';
-    }
-    // Check if it's a home work date
-    if (home_work_dates.includes(dateStr)) {
-      return 'home';
-    }
-    // Check if it's an office work date
-    if (office_work_dates.includes(dateStr)) {
-      return 'office';
-    }
-    // For future dates, return appropriate type
-    if (date.isAfter(today, 'day')) {
-      return 'office'; // Future dates show as office style but aren't explicitly marked
-    }
-    // Default to office for past dates (up to current date)
+    if (dayOfWeek === 0 || dayOfWeek === 6) return 'weekend';
+    const isIn = (arr?: string[]) => Array.isArray(arr) && arr.includes(dateStr);
+    if (isIn(incomplete_records_dates)) return 'incomplete';
+    if (isIn(leave_dates)) return 'leave';
+    if (isIn(home_work_dates)) return 'home';
+    if (isIn(office_work_dates)) return 'office';
+
+    if (date.isAfter(today, 'day')) return undefined;
+
     return 'office';
   };
 
@@ -158,15 +137,18 @@ export default function AttendanceCalendar({
       days.push(
         <div
           key={`prev-${day}`}
-          className={getDayStyles(dayType, false)}
-          title={holidayInfo?.name || `${dayType.charAt(0).toUpperCase() + dayType.slice(1)} day`}
+          className={
+            dayType
+              ? getDayStyles(dayType, false)
+              : 'flex h-12 items-center justify-center rounded-md border text-base opacity-40'
+          }
+          title={dayType ? holidayInfo?.name || `${dayType.charAt(0).toUpperCase() + dayType.slice(1)} day` : ''}
         >
           {day}
         </div>,
       );
     }
 
-    // Current month days
     for (let day = 1; day <= daysInMonth; day++) {
       const dayType = getDayType(day, currentMonth, currentYear);
       const dateStr = currentDate.date(day).format('YYYY-MM-DD');
@@ -175,8 +157,12 @@ export default function AttendanceCalendar({
       days.push(
         <div
           key={day}
-          className={getDayStyles(dayType, true)}
-          title={holidayInfo?.name || `${dayType.charAt(0).toUpperCase() + dayType.slice(1)} day`}
+          className={
+            dayType
+              ? getDayStyles(dayType, true)
+              : 'flex h-12 items-center justify-center rounded-md border text-base opacity-40'
+          }
+          title={dayType ? holidayInfo?.name || `${dayType.charAt(0).toUpperCase() + dayType.slice(1)}` : ''}
         >
           {day}
         </div>,
@@ -196,8 +182,12 @@ export default function AttendanceCalendar({
       days.push(
         <div
           key={`next-${day}`}
-          className={getDayStyles(dayType, false)}
-          title={holidayInfo?.name || `${dayType.charAt(0).toUpperCase() + dayType.slice(1)} day`}
+          className={
+            dayType
+              ? getDayStyles(dayType, false)
+              : 'flex h-12 items-center justify-center rounded-md border text-base opacity-40'
+          }
+          title={dayType ? holidayInfo?.name || `${dayType.charAt(0).toUpperCase() + dayType.slice(1)}` : ''}
         >
           {day}
         </div>,
