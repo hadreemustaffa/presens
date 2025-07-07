@@ -42,7 +42,11 @@ export default function UserSelect({ users, activeUser }: { users: UserMetadata[
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-h-80">
         {users.map((u) => (
-          <DropdownMenuItem key={u.employee_id} onClick={() => handleChange(u.employee_id)}>
+          <DropdownMenuItem
+            key={u.employee_id}
+            disabled={u.employee_id === userParam}
+            onClick={() => handleChange(u.employee_id)}
+          >
             {u.full_name}
           </DropdownMenuItem>
         ))}

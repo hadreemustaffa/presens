@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 import ClockOutForm from '@/components/forms/clock-out-form';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { lunchIn, lunchOut } from '@/features/attendance/records/actions/actions';
 import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
@@ -39,9 +39,11 @@ export default function QuickActions(record: AttendanceRecord) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Card className="flex flex-col gap-4 rounded-md border p-4">
-        <CardTitle>Quick Actions</CardTitle>
-        <CardContent className="grid grid-cols-1 justify-between gap-4 px-0 sm:grid-cols-2">
+      <Card className="@container/card">
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 justify-between gap-4 sm:grid-cols-2">
           <DialogTrigger asChild>
             <Button
               size={'lg'}
