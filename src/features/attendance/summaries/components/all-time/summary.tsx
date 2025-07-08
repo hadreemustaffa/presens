@@ -57,6 +57,7 @@ export default function Summary({
             leave_dates={summary.leave_dates}
             public_holidays_dates={summary.public_holidays_dates}
             incomplete_records_dates={summary.incomplete_records_dates}
+            first_work_date={summary.first_work_date}
           />
 
           <div className="flex h-full flex-col gap-4">

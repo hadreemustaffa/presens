@@ -27,6 +27,7 @@ interface AttendanceCalendarProps {
   leave_dates?: string[];
   public_holidays_dates?: PublicHoliday[];
   incomplete_records_dates?: string[];
+  first_work_date: string;
 }
 
 export default function AttendanceCalendar({
@@ -35,6 +36,7 @@ export default function AttendanceCalendar({
   leave_dates = [],
   public_holidays_dates = [],
   incomplete_records_dates = [],
+  first_work_date = '',
 }: AttendanceCalendarProps) {
   const [currentDate, setCurrentDate] = useState(dayjs());
 
@@ -92,6 +94,10 @@ export default function AttendanceCalendar({
 
     if (date.isAfter(today, 'day')) return undefined;
 
+    if (first_work_date !== '') {
+      if (date.isBefore(first_work_date, 'day')) return undefined;
+    }
+
     return 'office';
   };
 
@@ -103,21 +109,21 @@ export default function AttendanceCalendar({
 
     switch (type) {
       case 'office':
-        return `${baseStyles} bg-blue-800/10 border-blue-800/50 hover:bg-blue-800/50 ${opacityClass}`;
+        return `${baseStyles} bg-blue-500/10 border-blue-500/50 hover:bg-blue-500/50 ${opacityClass}`;
       case 'home':
-        return `${baseStyles} bg-green-800/10 border-green-800/50 hover:bg-green-800/50 ${opacityClass}`;
+        return `${baseStyles} bg-primary/10 border-primary/50 hover:bg-primary/50 ${opacityClass}`;
       case 'leave':
-        return `${baseStyles} bg-red-800/10 border-red-800/50 hover:bg-red-800/50 ${opacityClass}`;
+        return `${baseStyles} bg-red-500/10 border-red-500/50 hover:bg-red-500/50 ${opacityClass}`;
       case 'weekend':
         return `${baseStyles} text-gray-500 ${opacityClass}`;
       case 'holiday':
-        return `${baseStyles} bg-purple-800/10 border-purple-800/50 hover:bg-purple-800/50 ${opacityClass}`;
+        return `${baseStyles} bg-purple-500/10 border-purple-500/50 hover:bg-purple-500/50 ${opacityClass}`;
       case 'incomplete':
         return `${baseStyles} bg-foreground/10 border-foreground/50 hover:bg-foreground/50 ${opacityClass}`;
       case 'today':
-        return `${baseStyles} bg-primary/10 relative after:content-[''] after:w-7 after:h-7 after:rounded-full after:border after:opacity-50 after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 border-primary/50 hover:bg-primary/50 ${opacityClass}`;
+        return `${baseStyles} relative after:content-[''] after:w-7 after:h-7 after:rounded-full after:border after:opacity-50 after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 border-gray/50 ${opacityClass}`;
       default:
-        return `${baseStyles} bg-white text-gray-800 border-gray-800/50 hover:bg-gray-50 ${opacityClass}`;
+        return `${baseStyles} bg-white text-gray-500 border-gray-500/50 hover:bg-gray-50 ${opacityClass}`;
     }
   };
 
@@ -244,11 +250,11 @@ const CalendarLegend = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuItem>
-          <Building2 className="text-blue-800" />
+          <Building2 className="text-blue-500" />
           Office
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Home className="text-green-800" />
+          <Home className="text-primary" />
           Home
         </DropdownMenuItem>
         <DropdownMenuItem>
@@ -256,7 +262,7 @@ const CalendarLegend = () => {
           Leave
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Calendar className="text-purple-800" />
+          <Calendar className="text-purple-500" />
           Public Holidays
         </DropdownMenuItem>
         <DropdownMenuItem>

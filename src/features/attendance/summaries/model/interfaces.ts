@@ -24,4 +24,5 @@ export interface AllTimeAttendanceSummary {
     date: string;
     name: string;
   }[];
+  first_work_date: string;
 }

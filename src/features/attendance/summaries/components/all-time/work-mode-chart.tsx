@@ -16,11 +16,11 @@ const chartConfig = {
   },
   home: {
     label: 'Home',
-    color: 'var(--chart-1)',
+    color: 'var(--primary)',
   },
   office: {
     label: 'Office',
-    color: 'var(--primary)',
+    color: 'var(--color-blue-500)',
   },
 } satisfies ChartConfig;
 

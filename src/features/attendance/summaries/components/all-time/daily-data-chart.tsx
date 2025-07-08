@@ -27,7 +27,7 @@ const chartConfig = {
   },
   lunch_taken_minutes: {
     label: 'Lunch Minutes',
-    color: 'var(--chart-1)',
+    color: 'var(--color-blue-500)',
   },
 } satisfies ChartConfig;
 
