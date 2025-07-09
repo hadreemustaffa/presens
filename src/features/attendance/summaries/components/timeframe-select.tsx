@@ -31,7 +31,7 @@ export default function TimeframeSelect() {
     setLoading(true);
     const params = new URLSearchParams(searchParams);
     params.set('timeframe', timeframe.toString());
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   return (
