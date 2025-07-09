@@ -141,17 +141,14 @@ export default function DailyDataChart({ record }: { record: DailyDataRecord[] }
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex items-center justify-between gap-2 px-6 pb-6 text-sm">
-        <div className="flex flex-col gap-2">
-          <p className="flex gap-2 leading-none font-medium">
-            Averaging around{' '}
-            {activeChart === 'hours_worked' ? (
-              <>{(total.hours_worked / record.length).toFixed(1)} hours daily</>
-            ) : (
-              <>{Math.round(total.lunch_taken_minutes / record.length)} minutes daily</>
-            )}
-          </p>
-          <p className="text-muted-foreground leading-none">Based on the daily average for the past {timeframeText}</p>
-        </div>
+        <p className="flex gap-2 leading-none font-medium">
+          Averaging around{' '}
+          {activeChart === 'hours_worked' ? (
+            <>{(total.hours_worked / record.length).toFixed(1)} hours daily</>
+          ) : (
+            <>{Math.round(total.lunch_taken_minutes / record.length)} minutes daily</>
+          )}
+        </p>
         <TimeframeSelect />
       </CardFooter>
     </Card>
