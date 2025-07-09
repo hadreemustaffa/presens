@@ -1,8 +1,7 @@
 'use client';
 
-import { IconHourglassOff } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { Building2, Calendar, ChevronLeft, ChevronRight, Home, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -249,24 +250,26 @@ const CalendarLegend = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel>Day Colors</DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Building2 className="text-blue-500" />
+          <div className="h-4 w-4 rounded-full bg-blue-500"></div>
           Office
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Home className="text-primary" />
+          <div className="bg-primary h-4 w-4 rounded-full"></div>
           Home
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <X className="text-destructive" />
+          <div className="bg-destructive h-4 w-4 rounded-full"></div>
           Leave
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Calendar className="text-purple-500" />
+          <div className="h-4 w-4 rounded-full bg-purple-500"></div>
           Public Holidays
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <IconHourglassOff className="text-foreground" />
+          <div className="bg-foreground h-4 w-4 rounded-full"></div>
           Incomplete Record
         </DropdownMenuItem>
       </DropdownMenuContent>
