@@ -26,3 +26,11 @@ export interface AllTimeAttendanceSummary {
   }[];
   first_work_date: string;
 }
+
+export interface CsvData {
+  [key: string]: string;
+}
+
+export interface Exporter {
+  export(data: CsvData): Promise<string>;
+}

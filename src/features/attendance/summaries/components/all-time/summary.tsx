@@ -7,6 +7,7 @@ import DailyDataChart from '@/features/attendance/summaries/components/all-time/
 import MetricsCard from '@/features/attendance/summaries/components/all-time/metrics-card';
 import PreferredHomeDaysCard from '@/features/attendance/summaries/components/all-time/preferred-home-days-card';
 import WorkModeChart from '@/features/attendance/summaries/components/all-time/work-mode-chart';
+import ExportData from '@/features/attendance/summaries/components/export-data';
 import UserSelect from '@/features/attendance/summaries/components/user-select';
 import { AllTimeAttendanceSummary } from '@/features/attendance/summaries/model/interfaces';
 import { DailyDataRecord } from '@/features/attendance/summaries/model/types';
@@ -29,15 +30,18 @@ export default function Summary({
       <div className="flex flex-row items-center justify-between">
         <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
         {user?.user_metadata.user_role === 'admin' && (
-          <UserSelect
-            users={users}
-            activeUser={{
-              email: user.user_metadata.email,
-              full_name: user.user_metadata.full_name,
-              department: user.user_metadata.department,
-              employee_id: user.user_metadata.employee_id,
-            }}
-          />
+          <div className="flex items-center gap-4">
+            <ExportData />
+            <UserSelect
+              users={users}
+              activeUser={{
+                email: user.user_metadata.email,
+                full_name: user.user_metadata.full_name,
+                department: user.user_metadata.department,
+                employee_id: user.user_metadata.employee_id,
+              }}
+            />
+          </div>
         )}
       </div>
       <div className="flex flex-col gap-4">
