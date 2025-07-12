@@ -378,22 +378,9 @@ export function DataTable({ data, isAdmin }: DataTableProps) {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex w-fit items-center justify-center gap-2 text-sm font-medium">
-            <p>Page</p>
-            <Input
-              id="table-page"
-              type="number"
-              min="1"
-              max={table.getPageCount()}
-              defaultValue={table.getState().pagination.pageIndex + 1}
-              onChange={(e) => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                table.setPageIndex(page);
-              }}
-              className="h-fit w-16 rounded-md border text-right"
-            />
-            <p>of {table.getPageCount()}</p>
-          </div>
+
+          <PageSelectorInput {...table} />
+
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
             <Button
               variant="outline"
@@ -438,6 +425,50 @@ export function DataTable({ data, isAdmin }: DataTableProps) {
         </div>
       </div>
     </>
+  );
+}
+
+function PageSelectorInput(table: TableType<AttendanceRecord | AttendanceRecordWithUserDetails>) {
+  const [pageInput, setPageInput] = React.useState(`${table.getState().pagination.pageIndex + 1}`);
+
+  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPageInput(value);
+
+    let page = Number(value);
+    const maxPage = table.getPageCount();
+
+    if (!value || isNaN(page) || page < 1) {
+      page = 1;
+    } else if (page > maxPage) {
+      page = maxPage;
+    }
+
+    if (!isNaN(Number(value))) {
+      table.setPageIndex(page - 1);
+    }
+  };
+
+  // Sync input value with table page index
+  // (e.g., when using navigation buttons)
+  React.useEffect(() => {
+    setPageInput(`${table.getState().pagination.pageIndex + 1}`);
+  }, [table]);
+
+  return (
+    <div className="flex w-fit items-center justify-center gap-2 text-sm font-medium">
+      <p>Page</p>
+      <Input
+        id="table-page"
+        type="number"
+        min="1"
+        max={table.getPageCount()}
+        value={pageInput}
+        onChange={handlePageInputChange}
+        className="h-fit w-16 rounded-md border text-right"
+      />
+      <p>of {table.getPageCount()}</p>
+    </div>
   );
 }
 
