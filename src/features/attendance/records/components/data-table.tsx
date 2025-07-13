@@ -203,7 +203,12 @@ const getColumns = (isAdmin: boolean): ColumnDef<AttendanceRecord | AttendanceRe
 ];
 
 export function DataTable({ data, isAdmin }: DataTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([
+    {
+      id: 'work_date',
+      desc: true,
+    },
+  ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [filterBy, setFilterBy] = React.useState('remarks');
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
@@ -307,7 +312,7 @@ export function DataTable({ data, isAdmin }: DataTableProps) {
 
       <div className="overflow-hidden rounded-md border">
         <Table>
-          <TableHeader className="bg-muted sticky top-0 z-10">
+          <TableHeader className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
