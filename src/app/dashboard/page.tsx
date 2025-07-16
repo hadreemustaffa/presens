@@ -7,7 +7,7 @@ import QuickActions from '@/components/quick-actions';
 import StatusCard from '@/components/status-card';
 import { getAttendanceRecord } from '@/features/attendance/records/api/attendance-records.api';
 
-export default async function DashboardPage() {
+export default async function Page() {
   const { user } = await getActiveUser();
 
   const record = await getAttendanceRecord({

@@ -21,18 +21,6 @@ export class AttendanceRecordsRepository {
       .eq('work_date', workDate);
   }
 
-  async updateRecordById(
-    updates: Partial<AttendanceRecord>,
-    employeeId: string,
-    workDate: string,
-  ): Promise<{ error: unknown }> {
-    return await this.supabase
-      .from('attendance_records')
-      .update(updates)
-      .eq('employee_id', employeeId)
-      .eq('work_date', workDate);
-  }
-
   async deleteRecord(id: number): Promise<{ error: unknown; count: number }> {
     const { error, count } = await this.supabase.from('attendance_records').delete({ count: 'exact' }).eq('id', id);
     return { error, count: count ?? 0 };
