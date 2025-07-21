@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { getActiveUser } from '@/api';
 import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
 import { AttendanceRecordsRepository } from '@/features/attendance/records/repositories/records';
+import { handleDatabaseError } from '@/features/shared/lib/utils';
 import { Remarks, WorkMode } from '@/features/shared/model/enums';
 import { ActionResult } from '@/features/shared/model/interfaces';
 import { DASHBOARD_PATH, RECORDS_PATH } from '@/lib/constants';
@@ -21,11 +22,6 @@ const createAttendanceRecord = (
     work_mode: workMode,
     ...fieldsWithoutId,
   } as AttendanceRecord;
-};
-
-const handleDatabaseError = (error: unknown, defaultMessage: string): ActionResult => {
-  console.error(error);
-  return { error: defaultMessage };
 };
 
 export class AttendanceRecordsService {

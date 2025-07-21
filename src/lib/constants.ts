@@ -25,3 +25,4 @@ export const TZ_KUALA_LUMPUR = 'Asia/Kuala_Lumpur';
 export const DASHBOARD_PATH = '/dashboard';
 export const RECORDS_PATH = '/dashboard/records';
 export const SUMMARIES_PATH = '/dashboard/summaries';
+export const SETTINGS_PATH = '/dashboard/settings';
