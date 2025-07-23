@@ -117,12 +117,6 @@ const getColumns = (isAdmin: boolean): ColumnDef<AttendanceRecord | AttendanceRe
     enableColumnFilter: false,
   },
   {
-    accessorKey: 'clock_out',
-    header: 'Clock Out',
-    cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('clock_out'))}</div>,
-    enableColumnFilter: false,
-  },
-  {
     accessorKey: 'lunch_out',
     header: 'Lunch Out',
     cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('lunch_out'))}</div>,
@@ -132,6 +126,12 @@ const getColumns = (isAdmin: boolean): ColumnDef<AttendanceRecord | AttendanceRe
     accessorKey: 'lunch_in',
     header: 'Lunch In',
     cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('lunch_in'))}</div>,
+    enableColumnFilter: false,
+  },
+  {
+    accessorKey: 'clock_out',
+    header: 'Clock Out',
+    cell: ({ row }) => <div>{formatTimeForDisplay(row.getValue('clock_out'))}</div>,
     enableColumnFilter: false,
   },
   {
