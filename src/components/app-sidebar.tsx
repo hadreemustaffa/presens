@@ -1,7 +1,7 @@
 'use client';
 
 import { IconBook, IconChartBar, IconDashboard, IconSettings } from '@tabler/icons-react';
-import { Clock } from 'lucide-react';
+import Image from 'next/image';
 import * as React from 'react';
 
 import { NavMain } from '@/components/nav-main';
@@ -50,11 +50,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center justify-between gap-2">
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
-                <Clock className="!size-5" />
-                <span className="text-base font-semibold">PRESENS</span>
-              </a>
+            <SidebarMenuButton className="data-[slot=sidebar-menu-button]:!p-2">
+              <Image src={'/icons/logo-16x16.png'} alt="" width={15} height={15} aria-hidden />
+              <span className="font-semibold">PRESENS</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
