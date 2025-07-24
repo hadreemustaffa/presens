@@ -1,18 +1,38 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { redirect } from 'next/navigation';
+import { useActionState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login } from '@/features/auth/actions/actions';
+import { useUser } from '@/features/users/hooks/use-user';
 import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'form'>) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(login, { error: '' });
+  const { mutate } = useUser();
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(login, { error: '', success: '' });
+
+  useEffect(() => {
+    if (state?.error) {
+      toast.error('An error has occurred', {
+        description: state.error,
+        action: { label: 'Close', onClick: () => {} },
+      });
+    }
+  }, [state]);
+
+  useEffect(() => {
+    if (state?.success) {
+      mutate();
+      redirect('/dashboard');
+    }
+  }, [mutate, state]);
 
   return (
     <form action={formAction} className={cn('flex flex-col gap-6', className)} {...props}>
