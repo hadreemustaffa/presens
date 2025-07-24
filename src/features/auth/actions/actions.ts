@@ -31,8 +31,7 @@ export const login = validatedAction(loginSchema, async (data) => {
     };
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/dashboard');
+  return { success: true };
 });
 
 const signupSchema = z
@@ -134,5 +133,5 @@ export const logout = async () => {
     };
   }
 
-  redirect('/');
+  return { success: true };
 };

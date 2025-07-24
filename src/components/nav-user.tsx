@@ -1,7 +1,9 @@
 'use client';
 
 import { IconDotsVertical, IconLogout } from '@tabler/icons-react';
-import { useActionState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useActionState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -19,8 +21,25 @@ import { ActionState } from '@/lib/middleware';
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user } = useUser();
-  const [state, action, pending] = useActionState<ActionState, FormData>(logout, { error: '' });
+  const { user, mutate } = useUser();
+  const router = useRouter();
+  const [state, action, pending] = useActionState<ActionState, FormData>(logout, { error: '', success: '' });
+
+  useEffect(() => {
+    if (state?.error) {
+      toast.error('An error has occurred', {
+        description: state.error,
+        action: { label: 'Close', onClick: () => {} },
+      });
+    }
+  }, [state]);
+
+  useEffect(() => {
+    if (state?.success) {
+      mutate(null, false);
+      router.replace('/');
+    }
+  }, [mutate, router, state]);
 
   return (
     <SidebarMenu>
