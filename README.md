@@ -1,11 +1,11 @@
-# Presens Attendance System
+# Presens: Attendance System
 
 A modern, full-stack attendance management system built with Next.js and Supabase. Designed for organizations and teams to efficiently track, analyze, and manage employee attendance, work modes, and analytics—all with a beautiful, responsive UI.
 
 ## 🚀 Features
 
 - **Comprehensive Attendance Tracking:**  
-  Record clock-in/out times, attendance remarks, and work modes (e.g., office, remote, leave) with ease.
+  Record clock-in/out and lunch-out/in times, attendance remarks, and work modes (e.g., office, home) with ease.
 
 - **Employee Analytics & Summaries:**  
   Visualize attendance trends, daily work hours, and all-time summaries with interactive charts and dashboards.
@@ -16,8 +16,8 @@ A modern, full-stack attendance management system built with Next.js and Supabas
 - **User Management:**  
   Self-service sign-up, password management, and account settings.
 
-- **Public Holidays & Leave Management:**  
-  Integrated public holiday calendar and leave status tracking.
+- **Work Calendar:**  
+  Integrated workdays calendar with public holidays.
 
 - **Data Export:**  
   Export attendance and summary data in CSV format for reporting or analysis.
