@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login, loginDemoUser } from '@/features/auth/actions/actions';
 import { useUser } from '@/features/users/hooks/use-user';
-import { DEMO_EMAIL, DEMO_PASSWORD } from '@/lib/constants';
 import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 

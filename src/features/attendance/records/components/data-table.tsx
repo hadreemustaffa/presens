@@ -16,7 +16,6 @@ import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, Chev
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
-import Loading from '@/app/dashboard/records/loading';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -159,11 +158,7 @@ const getColumns = (isAdmin: boolean): ColumnDef<AttendanceRecord | AttendanceRe
 export function DataTable({ user, isAdmin }: DataTableProps) {
   const { paginationParams, setPaginationParams } = usePaginationSearchParams();
 
-  const {
-    data: paginatedData,
-    isLoading,
-    error,
-  } = useAttendanceRecords(user?.user_metadata.employee_id, {
+  const { data: paginatedData, isLoading } = useAttendanceRecords(user?.user_metadata.employee_id, {
     ...paginationParams,
     sortDirection: paginationParams.sortDirection as SortDirection | undefined,
   });
@@ -255,14 +250,6 @@ export function DataTable({ user, isAdmin }: DataTableProps) {
       },
     },
   });
-
-  if (!paginatedData) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return <div>Test</div>;
-  }
 
   return (
     <>
