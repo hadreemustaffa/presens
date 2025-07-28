@@ -26,3 +26,6 @@ export const DASHBOARD_PATH = '/dashboard';
 export const RECORDS_PATH = '/dashboard/records';
 export const SUMMARIES_PATH = '/dashboard/summaries';
 export const SETTINGS_PATH = '/dashboard/settings';
+
+export const DEMO_EMAIL = 'email@example.com';
+export const DEMO_PASSWORD = 'demoaccount';

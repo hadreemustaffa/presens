@@ -9,8 +9,9 @@ import { ErrorMessage } from '@/components/error-message';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { login } from '@/features/auth/actions/actions';
+import { login, loginDemoUser } from '@/features/auth/actions/actions';
 import { useUser } from '@/features/users/hooks/use-user';
+import { DEMO_EMAIL, DEMO_PASSWORD } from '@/lib/constants';
 import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 
@@ -73,6 +74,39 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'form'>)
           {pending ? 'Loading...' : 'Login'}
         </Button>
       </div>
+    </form>
+  );
+}
+
+export function LoginDemoUserForm({ className, ...props }: React.ComponentProps<'form'>) {
+  const { mutate } = useUser();
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(loginDemoUser, { error: '', success: '' });
+
+  useEffect(() => {
+    if (state?.error) {
+      toast.error('An error has occurred', {
+        description: state.error,
+        action: { label: 'Close', onClick: () => {} },
+      });
+    }
+  }, [state]);
+
+  useEffect(() => {
+    if (state?.success) {
+      mutate();
+      redirect('/dashboard');
+    }
+  }, [mutate, state]);
+
+  return (
+    <form action={formAction} className={cn('flex flex-col gap-6', className)} {...props}>
+      <div className="grid gap-6">
+        <Button type="submit" variant={'secondary'} className="w-full hover:cursor-pointer" disabled={pending}>
+          {pending ? 'Loading...' : 'Login Demo Account'}
+        </Button>
+        {state.error && <ErrorMessage>{state.error}</ErrorMessage>}
+      </div>
+
       <div className="text-center text-sm">
         Don&apos;t have an account?{' '}
         <Link href="/auth/sign-up" className="underline underline-offset-4">

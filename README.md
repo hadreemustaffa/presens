@@ -2,6 +2,15 @@
 
 A modern, full-stack attendance management system built with Next.js and Supabase. Designed for organizations and teams to efficiently track, analyze, and manage employee attendance, work modes, and analytics—all with a beautiful, responsive UI.
 
+## 🧪 Demo Credentials
+
+You can try the app using the following account:
+
+- email: `email@example.com`
+- password: `demoaccount`
+
+Or click the **"Login Demo Account"** button on the login page.
+
 ## 🚀 Features
 
 - **Comprehensive Attendance Tracking:**  

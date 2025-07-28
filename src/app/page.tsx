@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { LoginForm } from '@/components/forms/login-form';
+import { LoginDemoUserForm, LoginForm } from '@/components/forms/login-form';
 
 export default function Home() {
   return (
@@ -12,7 +12,10 @@ export default function Home() {
           <Image src={'/icons/logo-32x32.png'} alt="" width={32} height={32} aria-hidden />
           <span className="font-semibold">PRESENS</span>
         </p>
-        <LoginForm />
+        <div className="flex flex-col gap-4">
+          <LoginForm />
+          <LoginDemoUserForm />
+        </div>
       </div>
     </main>
   );

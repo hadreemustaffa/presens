@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { Departments } from '@/features/shared/model/enums';
+import { DEMO_EMAIL, DEMO_PASSWORD } from '@/lib/constants';
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
 
@@ -33,6 +34,23 @@ export const login = validatedAction(loginSchema, async (data) => {
 
   return { success: true };
 });
+
+export const loginDemoUser = async () => {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: DEMO_EMAIL,
+    password: DEMO_PASSWORD,
+  });
+
+  if (error) {
+    return {
+      error: 'Invalid email or password. Please try again.',
+    };
+  }
+
+  return { success: true };
+};
 
 const signupSchema = z
   .object({
