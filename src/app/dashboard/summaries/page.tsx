@@ -8,6 +8,11 @@ import { SummarySearchParams } from '@/features/attendance/summaries/model/types
 import { getUsers } from '@/features/users/api/users.api';
 import { DEFAULT_CHART_TIMEFRAME, MIN_DAYS_FOR_SUMMARIES } from '@/lib/constants';
 
+export const metadata = {
+  title: 'Summaries',
+  description: 'View attendance summaries for insights.',
+};
+
 export default async function Page(props: { searchParams: SummarySearchParams }) {
   const { user, isAdmin } = await getActiveUser();
   const searchParams = await props.searchParams;

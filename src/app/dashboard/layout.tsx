@@ -2,6 +2,14 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarProvider } from '@/components/ui/sidebar';
 
+export const metadata = {
+  title: {
+    default: 'Dashboard | Presens',
+    template: '%s | Presens',
+  },
+  description: 'Track your attendance, work modes, and analytics.',
+};
+
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider

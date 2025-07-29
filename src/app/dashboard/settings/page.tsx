@@ -3,6 +3,11 @@ import AccountInformationForm from '@/features/users/components/account-informat
 import ChangeEmailForm from '@/features/users/components/change-email-form';
 import ChangePasswordForm from '@/features/users/components/change-password-form';
 
+export const metadata = {
+  title: 'Settings',
+  description: 'Manage your account informations.',
+};
+
 export default async function Page() {
   const data = await getActiveUser();
 
