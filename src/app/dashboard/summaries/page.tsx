@@ -1,11 +1,10 @@
 import dayjs from 'dayjs';
 
-import { getActiveUser } from '@/api';
 import { getAllTimeSummary, getDailyDataRecords } from '@/features/attendance/summaries/api/attendance-summaries.api';
 import Summary from '@/features/attendance/summaries/components/all-time/summary';
 import UserSelect from '@/features/attendance/summaries/components/user-select';
 import { SummarySearchParams } from '@/features/attendance/summaries/model/types';
-import { getUsers } from '@/features/users/api/users.api';
+import { getActiveUser, getUsers } from '@/features/users/api/users.api';
 import { DEFAULT_CHART_TIMEFRAME, MIN_DAYS_FOR_SUMMARIES } from '@/lib/constants';
 
 export const metadata = {

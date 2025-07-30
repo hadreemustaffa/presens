@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { getActiveUser } from '@/api';
 import { DataTable } from '@/features/attendance/records/components/data-table';
+import { getActiveUser } from '@/features/users/api/users.api';
 
 export const metadata = {
   title: 'Records',

@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 
-import { getActiveUser } from '@/api';
 import { ActivityCards } from '@/components/activity-cards';
 import AddAttendanceRecordForm from '@/components/forms/add-attendance-record-form';
 import QuickActions from '@/components/quick-actions';
 import StatusCard from '@/components/status-card';
 import { getAttendanceRecord } from '@/features/attendance/records/api/attendance-records.api';
+import { getActiveUser } from '@/features/users/api/users.api';
 
 export default async function Page() {
   const { user } = await getActiveUser();

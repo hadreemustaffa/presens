@@ -1,4 +1,4 @@
-import { getActiveUser } from '@/api';
+import { getActiveUser } from '@/features/users/api/users.api';
 import AccountInformationForm from '@/features/users/components/account-information-form';
 import ChangeEmailForm from '@/features/users/components/change-email-form';
 import ChangePasswordForm from '@/features/users/components/change-password-form';

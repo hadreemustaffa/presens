@@ -1,11 +1,11 @@
 import { revalidatePath } from 'next/cache';
 
-import { getActiveUser } from '@/api';
 import { AttendanceRecord } from '@/features/attendance/records/model/interfaces';
 import { AttendanceRecordsRepository } from '@/features/attendance/records/repositories/records';
 import { handleDatabaseError } from '@/features/shared/lib/utils';
 import { Remarks, WorkMode } from '@/features/shared/model/enums';
 import { ActionResult } from '@/features/shared/model/interfaces';
+import { getActiveUser } from '@/features/users/api/users.api';
 import { DASHBOARD_PATH, RECORDS_PATH } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentDate, getCurrentTime } from '@/lib/utils';
