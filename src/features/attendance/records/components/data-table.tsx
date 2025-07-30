@@ -16,6 +16,7 @@ import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, Chev
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
+import Loading from '@/app/dashboard/records/_components/loading';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -250,6 +251,10 @@ export function DataTable({ user, isAdmin }: DataTableProps) {
       },
     },
   });
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <>
