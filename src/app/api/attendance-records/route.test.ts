@@ -2,15 +2,15 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, MockedFunction, vi } from 'vitest';
 
-import { getActiveUser } from '@/api';
 import { GET } from '@/app/api/attendance-records/route';
 import {
   getAllAttendanceRecords,
   getAllEmployeesAttendanceRecords,
 } from '@/features/attendance/records/api/attendance-records.api';
+import { getActiveUser } from '@/features/users/api/users.api';
 
 // Mock dependencies
-vi.mock('@/api');
+vi.mock('@/features/users/api/users.api');
 vi.mock('@/features/attendance/records/api/attendance-records.api');
 
 const mockGetActiveUser = getActiveUser as MockedFunction<typeof getActiveUser>;

@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { revalidatePath } from 'next/cache';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { getActiveUser } from '@/api';
 import {
   clockInHome,
   clockInOffice,
@@ -16,6 +15,7 @@ import {
   deleteMultipleRecords,
 } from '@/features/attendance/records/actions/actions';
 import { WorkMode, Remarks } from '@/features/shared/model/enums';
+import { getActiveUser } from '@/features/users/api/users.api';
 import { createClient } from '@/lib/supabase/server';
 import { Database } from '@/lib/types/supabase';
 
@@ -24,7 +24,7 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }));
 
-vi.mock('@/api', () => ({
+vi.mock('@/features/users/api/users.api', () => ({
   getActiveUser: vi.fn(),
 }));
 

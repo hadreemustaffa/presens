@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getActiveUser } from '@/api';
 import {
   getAllAttendanceRecords,
   getAllEmployeesAttendanceRecords,
 } from '@/features/attendance/records/api/attendance-records.api';
 import { PaginationParams } from '@/features/attendance/records/model/interfaces';
+import { getActiveUser } from '@/features/users/api/users.api';
 
 export async function GET(request: NextRequest) {
   try {
