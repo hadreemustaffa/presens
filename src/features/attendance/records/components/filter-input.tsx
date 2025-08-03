@@ -1,5 +1,6 @@
 import { Table } from '@tanstack/react-table';
 import { ChevronDown, Info, LoaderCircle } from 'lucide-react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,12 @@ export default function FilterInput({
   isLoading: boolean;
   table: Table<AttendanceRecord | AttendanceRecordWithUserDetails>;
 }) {
-  const [currentFilterKey, setCurrentFilterKey] = useState('remarks');
+  const searchParams = useSearchParams();
+  const paramsToFilterOut = ['page', 'pageSize', 'sortBy', 'sortDirection'];
+  const paramsArray = Array.from(searchParams.entries().filter(([key]) => !paramsToFilterOut.includes(key)));
+  const lastParam = paramsArray[paramsArray.length - 1];
+
+  const [currentFilterKey, setCurrentFilterKey] = useState(lastParam?.[0] || 'remarks');
 
   return (
     <div className="relative flex w-full items-center">

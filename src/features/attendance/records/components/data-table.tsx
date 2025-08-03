@@ -13,6 +13,7 @@ import {
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from 'lucide-react';
+import Link from 'next/link';
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -157,7 +158,7 @@ const getColumns = (isAdmin: boolean): ColumnDef<AttendanceRecord | AttendanceRe
 ];
 
 export function DataTable({ user, isAdmin }: DataTableProps) {
-  const { paginationParams, setPaginationParams } = usePaginationSearchParams();
+  const { paginationParams, setPaginationParams, buildSearchString } = usePaginationSearchParams();
 
   const { data: paginatedData, isLoading } = useAttendanceRecords(user?.user_metadata.employee_id, {
     ...paginationParams,
@@ -211,7 +212,7 @@ export function DataTable({ user, isAdmin }: DataTableProps) {
   );
 
   const handlePageChange = (page: number) => {
-    setPaginationParams({
+    buildSearchString({
       page,
     });
   };
@@ -389,46 +390,62 @@ export function DataTable({ user, isAdmin }: DataTableProps) {
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
             <Button
               variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
+              size={'icon'}
               title="First Page"
-              onClick={() => handlePageChange(1)}
-              disabled={paginatedData?.page === 1 || isLoading}
+              className={`hidden lg:flex ${paginatedData?.page === 1 || isLoading ? 'pointer-events-none opacity-50' : ''}`}
+              aria-disabled={paginatedData?.page === 1 || isLoading}
+              tabIndex={paginatedData?.page === 1 || isLoading ? -1 : undefined}
+              asChild
             >
-              <span className="sr-only">Go to first page</span>
-              <ChevronsLeft />
+              <Link href={buildSearchString({ page: 1 })}>
+                <span className="sr-only">Go to first page</span>
+                <ChevronsLeft />
+              </Link>
             </Button>
+
             <Button
               variant="outline"
-              className="size-8"
               size="icon"
               title="Previous Page"
-              onClick={() => handlePageChange((paginatedData?.page || 1) - 1)}
-              disabled={paginatedData?.page === 1 || isLoading}
+              className={`${paginatedData?.page === 1 || isLoading ? 'pointer-events-none opacity-50' : ''}`}
+              aria-disabled={paginatedData?.page === 1 || isLoading}
+              tabIndex={paginatedData?.page === 1 || isLoading ? -1 : undefined}
+              asChild
             >
-              <span className="sr-only">Go to previous page</span>
-              <ChevronLeft />
+              <Link href={buildSearchString({ page: (paginatedData?.page || 1) - 1 })}>
+                <span className="sr-only">Go to previous page</span>
+                <ChevronLeft />
+              </Link>
             </Button>
+
             <Button
               variant="outline"
-              className="size-8"
               size="icon"
               title="Next Page"
-              onClick={() => handlePageChange((paginatedData?.page || 1) + 1)}
-              disabled={paginatedData?.page === paginatedData?.totalPages || isLoading}
+              className={`${paginatedData?.page === paginatedData?.totalPages || isLoading ? 'pointer-events-none opacity-50' : ''}`}
+              aria-disabled={paginatedData?.page === paginatedData?.totalPages || isLoading}
+              tabIndex={paginatedData?.page === paginatedData?.totalPages || isLoading ? -1 : undefined}
+              asChild
             >
-              <span className="sr-only">Go to next page</span>
-              <ChevronRight />
+              <Link href={buildSearchString({ page: (paginatedData?.page || 1) + 1 })}>
+                <span className="sr-only">Go to next page</span>
+                <ChevronRight />
+              </Link>
             </Button>
+
             <Button
               variant="outline"
-              className="hidden size-8 lg:flex"
               size="icon"
               title="Last Page"
-              onClick={() => handlePageChange(paginatedData?.totalPages || 1)}
-              disabled={paginatedData?.page === paginatedData?.totalPages || isLoading}
+              className={`hidden lg:flex ${paginatedData?.page === paginatedData?.totalPages || isLoading ? 'pointer-events-none opacity-50' : ''}`}
+              aria-disabled={paginatedData?.page === paginatedData?.totalPages || isLoading}
+              tabIndex={paginatedData?.page === paginatedData?.totalPages || isLoading ? -1 : undefined}
+              asChild
             >
-              <span className="sr-only">Go to last page</span>
-              <ChevronsRight />
+              <Link href={buildSearchString({ page: paginatedData?.totalPages || 1 })}>
+                <span className="sr-only">Go to last page</span>
+                <ChevronsRight />
+              </Link>
             </Button>
           </div>
         </div>
