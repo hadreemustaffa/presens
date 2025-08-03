@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { useActionState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -10,13 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login, loginDemoUser } from '@/features/auth/actions/actions';
-import { useUser } from '@/features/users/hooks/use-user';
 import { ActionState } from '@/lib/middleware';
 import { cn } from '@/lib/utils';
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'form'>) {
-  const { mutate } = useUser();
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(login, { error: '', success: '' });
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(login, { error: '' });
 
   useEffect(() => {
     if (state?.error) {
@@ -26,13 +23,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'form'>)
       });
     }
   }, [state]);
-
-  useEffect(() => {
-    if (state?.success) {
-      mutate();
-      redirect('/dashboard');
-    }
-  }, [mutate, state]);
 
   return (
     <form action={formAction} className={cn('flex flex-col gap-6', className)} {...props}>
@@ -78,8 +68,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'form'>)
 }
 
 export function LoginDemoUserForm({ className, ...props }: React.ComponentProps<'form'>) {
-  const { mutate } = useUser();
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(loginDemoUser, { error: '', success: '' });
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(loginDemoUser, { error: '' });
 
   useEffect(() => {
     if (state?.error) {
@@ -89,13 +78,6 @@ export function LoginDemoUserForm({ className, ...props }: React.ComponentProps<
       });
     }
   }, [state]);
-
-  useEffect(() => {
-    if (state?.success) {
-      mutate();
-      redirect('/dashboard');
-    }
-  }, [mutate, state]);
 
   return (
     <form action={formAction} className={cn('flex flex-col gap-6', className)} {...props}>

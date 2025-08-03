@@ -15,12 +15,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { logout } from '@/features/auth/actions/actions';
-import { useUser } from '@/features/users/hooks/use-user';
+import { UserMetadata } from '@/features/users/model/interfaces';
 import { ActionState } from '@/lib/middleware';
 
-export function NavUser() {
+export function NavUser({ user }: { user: UserMetadata }) {
   const { isMobile } = useSidebar();
-  const { user } = useUser();
   const [state, action, pending] = useActionState<ActionState, FormData>(logout, { error: '', success: '' });
 
   useEffect(() => {
@@ -43,12 +42,12 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarFallback className="rounded-lg">
-                  {user?.user_metadata.full_name.charAt(0)}
-                  {user?.user_metadata.full_name.charAt(1)}
+                  {user?.full_name.charAt(0)}
+                  {user?.full_name.charAt(1)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user?.user_metadata.full_name}</span>
+                <span className="truncate font-medium">{user?.full_name}</span>
                 <span className="text-muted-foreground truncate text-xs">{user?.email}</span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -64,12 +63,12 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarFallback className="rounded-lg">
-                    {user?.user_metadata.full_name.charAt(0)}
-                    {user?.user_metadata.full_name.charAt(1)}
+                    {user?.full_name.charAt(0)}
+                    {user?.full_name.charAt(1)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user?.user_metadata.full_name}</span>
+                  <span className="truncate font-medium">{user?.full_name}</span>
                   <span className="text-muted-foreground truncate text-xs">{user?.email}</span>
                 </div>
               </div>

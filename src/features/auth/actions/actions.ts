@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { Departments } from '@/features/shared/model/enums';
-import { DEMO_EMAIL, DEMO_PASSWORD } from '@/lib/constants';
+import { DASHBOARD_PATH, DEMO_EMAIL, DEMO_PASSWORD } from '@/lib/constants';
 import { validatedAction } from '@/lib/middleware';
 import { createClient } from '@/lib/supabase/server';
 
@@ -32,7 +32,7 @@ export const login = validatedAction(loginSchema, async (data) => {
     };
   }
 
-  return { success: true };
+  redirect(DASHBOARD_PATH);
 });
 
 export const loginDemoUser = async () => {
@@ -49,7 +49,7 @@ export const loginDemoUser = async () => {
     };
   }
 
-  return { success: true };
+  redirect(DASHBOARD_PATH);
 };
 
 const signupSchema = z

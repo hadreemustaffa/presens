@@ -11,36 +11,24 @@ import ExportData from '@/features/attendance/summaries/components/export-data';
 import UserSelect from '@/features/attendance/summaries/components/user-select';
 import { AllTimeAttendanceSummary } from '@/features/attendance/summaries/model/interfaces';
 import { DailyDataRecord } from '@/features/attendance/summaries/model/types';
-import { useUser } from '@/features/users/hooks/use-user';
 import { UserMetadata } from '@/features/users/model/interfaces';
 
-export default function Summary({
-  summary,
-  dailyDataRecord,
-  users,
-}: {
+interface SummaryProps {
   summary: AllTimeAttendanceSummary;
   dailyDataRecord: DailyDataRecord[];
   users: UserMetadata[];
-}) {
-  const { user } = useUser();
+  user: UserMetadata;
+}
 
+export default function Summary({ summary, dailyDataRecord, users, user }: SummaryProps) {
   return (
     <div className="flex flex-col gap-4 px-4">
       <div className="flex flex-row items-center justify-between">
         <h2 className="my-2 text-xl font-bold">All Time Summary</h2>
-        {user?.user_metadata.user_role === 'admin' && (
+        {user?.user_role === 'admin' && (
           <div className="flex items-center gap-4">
-            <ExportData />
-            <UserSelect
-              users={users}
-              activeUser={{
-                email: user.user_metadata.email,
-                full_name: user.user_metadata.full_name,
-                department: user.user_metadata.department,
-                employee_id: user.user_metadata.employee_id,
-              }}
-            />
+            <ExportData user={user} />
+            <UserSelect users={users} activeUser={user} />
           </div>
         )}
       </div>

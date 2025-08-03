@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { exportToCsv } from '@/features/attendance/summaries/actions/actions';
-import { useUser } from '@/features/users/hooks/use-user';
+import { UserMetadata } from '@/features/users/model/interfaces';
 import { ActionState } from '@/lib/middleware';
 
 interface ExportActionState extends ActionState {
@@ -21,15 +21,14 @@ interface ExportActionState extends ActionState {
   filename?: string;
 }
 
-export default function ExportData() {
+export default function ExportData({ user }: { user: UserMetadata }) {
   const [state, action, pending] = useActionState<ExportActionState, FormData>(exportToCsv, { error: '', success: '' });
 
-  const { user } = useUser();
-  const isAdmin = user?.user_metadata.user_role === 'admin';
+  const isAdmin = user?.user_role === 'admin';
   const searchParams = useSearchParams();
   const employee_id = searchParams.get('employee_id');
 
-  const selectedUserId = isAdmin && employee_id ? employee_id : user?.user_metadata.employee_id;
+  const selectedUserId = isAdmin && employee_id ? employee_id : user?.employee_id;
 
   const downloadCsv = (csvData: string, filename: string) => {
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
