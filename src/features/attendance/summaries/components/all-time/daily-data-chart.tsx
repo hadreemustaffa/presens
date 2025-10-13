@@ -68,6 +68,22 @@ export default function DailyDataChart({ record }: { record: DailyDataRecord[] }
     timeframeText = 'week';
   }
 
+  const calculateAverage = () => {
+    if (
+      total.hours_worked === 0 ||
+      total.hours_worked == undefined ||
+      total.lunch_taken_minutes === 0 ||
+      total.lunch_taken_minutes == undefined
+    )
+      return 'Insufficient data to calculate average';
+
+    if (activeChart === 'hours_worked') {
+      return 'Averaging around ' + (total.hours_worked / record.length).toFixed(1) + ' hours daily';
+    } else {
+      return 'Averaging around ' + Math.round(total.lunch_taken_minutes / record.length) + ' minutes daily';
+    }
+  };
+
   return (
     <Card className="col-span-1 py-0 @[840px]/main:col-span-2">
       <CardHeader className="flex flex-col items-stretch border-b !p-0 @lg/main:flex-row">
@@ -141,14 +157,7 @@ export default function DailyDataChart({ record }: { record: DailyDataRecord[] }
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex items-center justify-between gap-2 px-6 pb-6 text-sm">
-        <p className="flex gap-2 leading-none font-medium">
-          Averaging around{' '}
-          {activeChart === 'hours_worked' ? (
-            <>{(total.hours_worked / record.length).toFixed(1)} hours daily</>
-          ) : (
-            <>{Math.round(total.lunch_taken_minutes / record.length)} minutes daily</>
-          )}
-        </p>
+        <p className="flex gap-2 leading-none font-medium">{calculateAverage()}</p>
         <TimeframeSelect />
       </CardFooter>
     </Card>

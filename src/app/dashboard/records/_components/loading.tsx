@@ -6,7 +6,6 @@ export default function Loading() {
       <div className="flex items-center gap-4 py-4">
         <div className="flex h-9 w-full items-center justify-between">
           <div className="bg-muted h-full w-full max-w-md rounded-md"></div>
-          <div className="bg-muted h-full w-32 rounded-md"></div>
         </div>
       </div>
 
